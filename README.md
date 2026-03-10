@@ -1,37 +1,58 @@
-## AgriPrice Intelligence — Tamil Nadu Mandi Advisory
+<div align="center">
 
-AgriPrice Intelligence is an end‑to‑end price intelligence tool for Tamil Nadu agricultural markets.  
-It combines **historical mandi prices (MySQL)**, **OpenWeather 3‑day forecast**, **festival demand**, and **Google Gemini AI** to generate clear **BUY / SELL / HOLD** advisories for farmers, traders, and consumers.
+  <h2>🌾 AgriPrice Intelligence</h2>
+  <h4>Tamil Nadu Mandi Price & AI Advisory Dashboard</h4>
 
-### Features
+  <p>
+    <strong>For Farmers · Traders · Consumers</strong><br/>
+    Smarter BUY / SELL / HOLD decisions with data + weather + festivals + AI.
+  </p>
 
-- **Multi‑role advisory**: Separate views for **Farmer (Producer)**, **Trader (Distributor)**, and **Consumer (Buyer)**.
-- **District + commodity selection**: 38 Tamil Nadu districts and 80+ commodities from Agmarknet.
-- **Price intelligence backend**:
-  - 7‑day sliding window price history from MySQL.
-  - Trend detection (rising / falling / stable) and confidence score.
-  - Predictions for **tomorrow** and **day after tomorrow**.
-  - Harvest season and nearby festival impact.
-- **AI advisory layer (Gemini)**:
-  - Enriched, human‑friendly 3–4 line advisory based on price signal, weather, harvest, and festivals.
-  - Web‑search fallback when DB has no data for a district–commodity pair.
-- **Modern frontend UI**:
-  - Single‑page layout with **Home**, **Seasonal Calendar**, and **About** pages.
-  - Animated ticker for daily “market movers”.
-  - Visual cards for stats, price chart, 3‑day weather, and festivals.
+  <p>
+    <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" />
+    <img alt="Flask" src="https://img.shields.io/badge/Flask-Backend-000000?style=for-the-badge&logo=flask&logoColor=white" />
+    <img alt="MySQL" src="https://img.shields.io/badge/MySQL-Data-blue?style=for-the-badge&logo=mysql&logoColor=white" />
+    <img alt="Chart.js" src="https://img.shields.io/badge/Chart.js-Visuals-ff6384?style=for-the-badge&logo=chartdotjs&logoColor=white" />
+  </p>
+
+</div>
 
 ---
 
-## Tech Stack
+### 🔍 At a Glance
 
-- **Backend**: Python, Flask, Flask‑CORS
-- **Database**: MySQL (schema: `mandi_prices`, `commodity_prices`)
-- **Data sources**:
-  - Agmarknet API (historical mandi prices)
-  - OpenWeatherMap (3‑day forecast)
-  - Google Gemini (AI advisory + price search fallback)
-  - Unsplash API (commodity images)
-- **Frontend**: HTML, CSS, vanilla JS, Chart.js
+|                       |                                                                 |
+|-----------------------|-----------------------------------------------------------------|
+| **Domain**           | Commodity price intelligence for Tamil Nadu mandis              |
+| **Users**            | Farmer (Producer), Trader (Distributor), Consumer (Buyer)       |
+| **Backend**          | Python, Flask, Flask‑CORS, MySQL                                |
+| **AI Layer**         | Google Gemini (advisory + web‑search fallback)                  |
+| **Data Sources**     | Agmarknet, OpenWeather, static harvest + festival calendar      |
+| **Frontend**         | HTML, CSS, vanilla JS, Chart.js                                 |
+
+---
+
+### ✨ Key Features
+
+**🧑‍🌾 Role‑aware advisory**
+- Different guidance for **Farmer**, **Trader**, and **Consumer**.
+
+**📍 Smart district & commodity selection**
+- 38 districts, 80+ commodities from Agmarknet with clean dropdown UX.
+
+**📈 Price intelligence backend**
+- 7‑day sliding window price history (MySQL).  
+- Rising / Falling / Stable trend detection with confidence.  
+- Predictions for **tomorrow** and **day after tomorrow**.  
+- Harvest season and festival impact blended into the signal.
+
+**🤖 AI advisory (Gemini)**
+- 3–4 line, plain‑English advisory that merges price, weather, harvest, and festivals.  
+- Web‑search fallback when DB has no data for a given pair.
+
+**💻 Modern single‑page UI**
+- Home, Seasonal Calendar, and About sections.  
+- “Market movers” ticker, responsive info cards, and Chart.js visualizations.
 
 ---
 
@@ -59,21 +80,21 @@ AgriPrice_Intelligence/
 
 ---
 
-## Prerequisites
+## ✅ Prerequisites
 
-- **Python**: 3.10+ (project tested with 3.13)
+- **Python**: 3.10+ (tested with 3.13)
 - **MySQL**: running instance accessible from your machine
-- **Node / npm**: *optional*, only if you later add tooling; current frontend is plain HTML/JS
 - **API keys**:
   - `AGMARKNET_API_KEY` (data.gov.in)
   - `OPENWEATHER_API_KEY`
   - `GEMINI_API_KEY`
+  - `UNSPLASH_ACCESS_KEY` (for commodity images)
 
-> **Important**: keep all API keys in `.env` (never commit them).
+> **Security**: keep all API keys in `.env` and never commit them. The repo only includes `.env.example` with placeholders.
 
 ---
 
-## 1. Environment Setup
+## 1. 🚀 Environment Setup
 
 ### 1.1 Clone the repository
 
@@ -115,7 +136,7 @@ DB_NAME=commodity_intelligence
 
 ---
 
-## 2. Database Setup
+## 2. 💾 Database Setup
 
 You need a MySQL schema that matches the queries in `backend/predict.py` and `backend/fetch_prices.py`.
 
@@ -139,7 +160,7 @@ CREATE DATABASE commodity_intelligence;
 
 ---
 
-## 3. Running the Backend
+## 3. 🧠 Running the Backend
 
 From the project root with the virtualenv activated:
 
@@ -160,7 +181,7 @@ Key endpoints:
 
 ---
 
-## 4. Running the Frontend
+## 4. 🌐 Running the Frontend
 
 The frontend is a static single‑page app.
 
@@ -184,7 +205,7 @@ Then open:
 
 ---
 
-## 5. How the Analysis Flow Works
+## 5. 📊 How the Analysis Flow Works
 
 1. User selects **user type**, **district**, and **commodity**, then clicks **“Analyse Market →”**.
 2. Frontend calls `POST /analyse` with:
@@ -211,11 +232,10 @@ Then open:
 
 ---
 
-## 6. Proof & Screenshots (replace with your images)
+## 6. 📷 Proof & Screenshots
 
-Create a `docs/` folder and add real screenshots, then update paths below.
+Place your screenshots under `docs/` and they will be rendered here.
 
-```markdown
 ### Home — District & Commodity Selection
 ![Home selection](docs/home-selection.png)
 
@@ -224,17 +244,10 @@ Create a `docs/` folder and add real screenshots, then update paths below.
 
 ### Seasonal Calendar
 ![Seasonal calendar](docs/seasonal-calendar.png)
-```
-
-Suggested screenshots:
-
-- **Home selection**: district + commodity dropdowns, user type buttons, and ticker.
-- **Analysis page**: full advisory card, stats, chart, markets, and weather.
-- **Seasonal calendar**: grid of crops vs months with peak/lean coloring.
 
 ---
 
-## 7. Deployment Notes
+## 7. 🚢 Deployment Notes
 
 - **Backend**:
   - Use a production WSGI server (e.g., `gunicorn` or `uwsgi`) behind Nginx or similar.
@@ -246,7 +259,7 @@ Suggested screenshots:
 
 ---
 
-## 8. Contributing / Future Work
+## 8. 🧭 Roadmap / Future Work
 
 - Add user authentication and saved watchlists.
 - Extend harvest calendar and festival data.
