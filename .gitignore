@@ -1,0 +1,21 @@
+# Environment variables — NEVER upload
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment
+.venv/
+venv/
+
+# VS Code
+.vscode/
+
+# MySQL dumps
+*.sql
+
+# OS files
+.DS_Store
+Thumbs.db

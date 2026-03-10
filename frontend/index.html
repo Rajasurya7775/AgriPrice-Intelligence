@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgriPrice Intelligence — Tamil Nadu</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ -->
+<!--  NAVBAR                               -->
+<!-- ═══════════════════════════════════════ -->
+<nav class="navbar">
+  <div class="navbar-brand" onclick="showPage('page1')">
+    <div class="logo">🌾</div>
+    <div>
+      <h1>AgriPrice Intelligence</h1>
+      <span>Tamil Nadu Mandi Advisory</span>
+    </div>
+  </div>
+
+  <div class="navbar-links">
+    <button class="nav-link nav-active" data-page="page1"
+            onclick="showPage('page1')">Home</button>
+    <button class="nav-link" data-page="page3"
+            onclick="loadSeasonal()">Seasonal Calendar</button>
+    <button class="nav-link" data-page="page4"
+            onclick="showPage('page4')">About</button>
+    <button class="nav-login" disabled title="Coming soon">
+      🔒 Login
+    </button>
+  </div>
+</nav>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div id="loadingText">Analysing market data...</div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!--  PAGE 1 — WELCOME + SELECTION         -->
+<!-- ═══════════════════════════════════════ -->
+<div id="page1" class="page active">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge">🌾 Tamil Nadu · 38 Districts · 80+ Commodities</div>
+    <h2>Smart Prices for<br><span>Tamil Nadu Farmers</span></h2>
+    <p>AI-powered mandi price predictions with weather, harvest season,
+       and festival demand analysis — all in one place.</p>
+  </div>
+
+  <!-- Market Movers Ticker -->
+  <div class="ticker-wrapper">
+    <div class="ticker-label">📈 Today's Movers</div>
+    <div id="moversTicker">
+      <span class="ticker-item">Loading market data...</span>
+    </div>
+  </div>
+
+  <!-- Selection card -->
+  <div class="selection-wrapper">
+    <div class="selection-card">
+
+      <!-- User type -->
+      <div class="section-label">Who are you?</div>
+      <div class="user-types">
+        <button class="user-btn selected" data-type="producer"
+                onclick="selectUser(this)">
+          <div class="icon">🌾</div>
+          <div class="label">Farmer</div>
+          <div class="sublabel">Producer</div>
+        </button>
+        <button class="user-btn" data-type="distributor"
+                onclick="selectUser(this)">
+          <div class="icon">🚚</div>
+          <div class="label">Trader</div>
+          <div class="sublabel">Distributor</div>
+        </button>
+        <button class="user-btn" data-type="consumer"
+                onclick="selectUser(this)">
+          <div class="icon">🛒</div>
+          <div class="label">Buyer</div>
+          <div class="sublabel">Consumer</div>
+        </button>
+      </div>
+
+      <!-- District + Commodity -->
+      <div class="dropdowns-row">
+        <div class="dropdown-group">
+          <label>District</label>
+          <select id="districtSelect" onchange="loadCommodities()">
+            <option value="">Loading districts...</option>
+          </select>
+        </div>
+        <div class="dropdown-group">
+          <label>Commodity</label>
+          <select id="commoditySelect" disabled>
+            <option value="">Select district first</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="analyse-btn" onclick="runAnalysis()">
+        Analyse Market →
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!--  PAGE 2 — RESULTS                     -->
+<!-- ═══════════════════════════════════════ -->
+<div id="page2" class="page">
+
+  <!-- Hero with commodity image -->
+  <div class="result-hero" id="resultHero">
+    <button class="back-btn" onclick="showPage('page1')">← Back</button>
+    <div class="source-badge" id="sourceBadge">🗄️ Database</div>
+    <div id="resultTitle">Loading...</div>
+    <div id="resultSubtitle">Loading...</div>
+  </div>
+
+  <div class="results-content">
+
+    <!-- AI Advisory -->
+    <div class="advisory-card">
+      <div class="advisory-label">🤖 AI Advisory — Powered by Gemini</div>
+      <div id="advisoryText">Loading advisory...</div>
+      <div class="signal-badge" id="signalBadge">...</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Latest Price</div>
+        <div class="stat-value" id="latestPrice">—</div>
+        <div class="stat-note" id="lastDate">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Weekly Average</div>
+        <div class="stat-value" id="weeklyAvg">—</div>
+        <div class="stat-note" id="trendText">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Confidence</div>
+        <div class="stat-value" id="confidence">—</div>
+        <div class="stat-note" id="harvestStatus">—</div>
+      </div>
+    </div>
+
+    <!-- Predictions -->
+    <div class="predictions-row">
+      <div class="pred-card">
+        <div class="pred-label">📅 Tomorrow</div>
+        <div class="pred-price" id="tomorrowPrice">—</div>
+        <div class="pred-unit">per quintal</div>
+      </div>
+      <div class="pred-card">
+        <div class="pred-label">📅 Day After Tomorrow</div>
+        <div class="pred-price" id="dayAfterPrice">—</div>
+        <div class="pred-unit">per quintal</div>
+      </div>
+    </div>
+
+    <!-- Chart + Markets -->
+    <div class="cards-grid" id="chartSection">
+      <div class="card">
+        <div class="card-title">📈 7 Day Price History</div>
+        <canvas id="priceChart" height="200"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-title">🏪 Markets in District</div>
+        <div id="marketsList">Loading...</div>
+      </div>
+    </div>
+
+    <!-- Weather -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">🌦️ 3 Day Weather Forecast</div>
+      <div class="weather-row" id="weatherRow">Loading...</div>
+    </div>
+
+    <!-- Festivals -->
+    <div class="card" id="festSection" style="display:none">
+      <div class="card-title">🎉 Upcoming Festivals</div>
+      <div id="festList"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!--  PAGE 3 — SEASONAL CALENDAR           -->
+<!-- ═══════════════════════════════════════ -->
+<div id="page3" class="page">
+  <div class="page-header">
+    <h2>🌱 Seasonal Crop Calendar</h2>
+    <p>Peak and lean seasons for Tamil Nadu commodities — plan ahead!</p>
+  </div>
+  <div id="seasonalGrid">Loading...</div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!--  PAGE 4 — ABOUT                       -->
+<!-- ═══════════════════════════════════════ -->
+<div id="page4" class="page">
+  <h2>About This Project</h2>
+  <p>
+    AgriPrice Intelligence is a multi-factor commodity price prediction system
+    for Tamil Nadu mandis. It integrates real-time Agmarknet price data,
+    OpenWeatherMap 3-day forecasts, festival demand patterns, and agricultural
+    harvest cycles to deliver actionable BUY/SELL/HOLD advisories powered by
+    Google Gemini AI.
+  </p>
+  <p>
+    Built for farmers, traders, and consumers across 38 Tamil Nadu districts
+    covering 80+ commodities. Predictions use a 7-day sliding window moving
+    average with graceful Gemini web-search fallback when live data is unavailable.
+  </p>
+
+  <div class="section-label" style="margin-top:32px">Tech Stack</div>
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="tech-name">Python + Flask</div>
+      <div class="tech-desc">REST API Backend</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-name">MySQL</div>
+      <div class="tech-desc">Sliding Window DB</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-name">Agmarknet API</div>
+      <div class="tech-desc">Live Price Data</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-name">Google Gemini</div>
+      <div class="tech-desc">AI Advisory + Fallback</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-name">OpenWeatherMap</div>
+      <div class="tech-desc">3-Day Forecast</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-name">Unsplash API</div>
+      <div class="tech-desc">Commodity Images</div>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts — order matters! -->
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
