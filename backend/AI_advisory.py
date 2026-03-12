@@ -266,9 +266,15 @@ Rules:
                 "google_search": {}
             }],
             "generationConfig": {
+<<<<<<< Updated upstream
                 "temperature"    : 1.0,
                 "maxOutputTokens": 300,
                 "thinkingConfig": { "thinkingBudget": 200}
+=======
+                "temperature"    : 0.3,
+                "maxOutputTokens": 300,
+                "thinkingConfig": {"thinkingBudget": 200}
+>>>>>>> Stashed changes
             }
         }
 

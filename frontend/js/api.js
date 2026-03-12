@@ -70,7 +70,17 @@ async function fetchAnalysis(userType, district, commodity) {
             commodity : commodity
         })
     });
-    return await res.json();
+    let data = null;
+    try { data = await res.json(); } catch (e) {
+        // #region agent log
+        __agentLog('A', 'frontend/js/api.js:fetchAnalysis', 'Failed to parse JSON', { status: res.status, ok: res.ok, error: String(e) });
+        // #endregion
+        throw e;
+    }
+    // #region agent log
+    __agentLog('A', 'frontend/js/api.js:fetchAnalysis', 'Analysis response', { status: res.status, ok: res.ok, dataStatus: data?.status, message: data?.message, data_source: data?.data_source });
+    // #endregion
+    return data;
 }
 
 // Get today's top movers
