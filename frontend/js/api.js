@@ -4,7 +4,6 @@
 // ============================================================
 
 const API_BASE      = "http://127.0.0.1:5000";
-const UNSPLASH_KEY  = "############################"; // ← replace with your key
 
 // #region agent log
 function __agentLog(hypothesisId, location, message, data = {}) {
@@ -102,23 +101,11 @@ async function fetchSeasonal() {
 // ─────────────────────────────────────────
 async function fetchCommodityImage(commodity) {
     try {
-        // Clean commodity name for search
-        const query = commodity
-            .replace(/\(.*?\)/g, "")  // remove brackets
-            .trim()
-            .split(" ")[0]            // first word only
-            .toLowerCase();
-
         const res  = await fetch(
-            `https://api.unsplash.com/search/photos?query=${query}+vegetable+food&per_page=1&orientation=landscape`,
-            { headers: { Authorization: `Client-ID ${UNSPLASH_KEY}` } }
+            `${API_BASE}/commodity-image?commodity=${encodeURIComponent(commodity)}`
         );
         const data = await res.json();
-
-        if (data.results && data.results.length > 0) {
-            return data.results[0].urls.regular;
-        }
-        return null;
+        return data.url || null;
     } catch(e) {
         return null;
     }

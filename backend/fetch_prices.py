@@ -1,7 +1,7 @@
 import requests
-import mysql.connector
-from backend.config import AGMARKNET_API_KEY,AGMARKNET_BASE_URL
+from backend.config import AGMARKNET_API_KEY,AGMARKNET_BASE_URL,PG_CONFIG
 from datetime import datetime
+import psycopg2
 
 # -----------------------
 # API CONFIG
@@ -15,30 +15,36 @@ params = {
     "api-key": API_KEY,
     "format": "json",
     "limit": 9999,
-    "filters[state.keyword]": "Tamil Nadu"
+    "filters[State]": "Tamil Nadu",
+    "filters[Arrival_Date]": "07/03/2026"
     
 }
 
 # -----------------------
-# MYSQL CONNECTION
+# POSTGRESQL CONNECTION
 # -----------------------
-
-db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="Surya@2005",
-    database="commodity_intelligence"
-)
-
+db     = psycopg2.connect(**PG_CONFIG)
 cursor = db.cursor()
 
 # -----------------------
 # FETCH DATA
 # -----------------------
 
-response = requests.get(url, params=params)
-
-data = response.json()
+try:
+    response = requests.get(url, params=params, timeout=60)
+    response.raise_for_status()  # Raise an exception for bad status codes
+    data = response.json()
+    print(f"API Response Status: {response.status_code}")
+    print(f"Records found: {len(data.get('records', []))}")
+except requests.exceptions.RequestException as e:
+    print(f"❌ API Request failed: {e}")
+    print(f"URL: {url}")
+    print(f"Params: {params}")
+    exit(1)
+except ValueError as e:
+    print(f"❌ JSON parsing failed: {e}")
+    print(f"Response text: {response.text[:500]}")
+    exit(1)
 
 
 records = data["records"]
@@ -46,7 +52,7 @@ records = data["records"]
 
 print("Total records:", len(records))
 print("Data inserted successfully")
-print(data)
+
 
 # -----------------------
 # INSERT INTO MYSQL
@@ -54,25 +60,28 @@ print(data)
 
 for record in records:
 
-    state = record.get("state")
-    district = record.get("district")
-    market = record.get("market")
-    commodity = record.get("commodity")
-    grade = record.get("grade")
-    min_price = record.get("min_price")
-    max_price = record.get("max_price")
-    modal_price = record.get("modal_price")
-    arrival_date_raw = record.get("arrival_date")
+    state = record.get("State")
+    district = record.get("District")
+    market = record.get("Market")
+    commodity = record.get("Commodity")
+    variety = record.get("Variety")
+    min_price = record.get("Min_Price")
+    max_price = record.get("Max_Price")
+    modal_price = record.get("Modal_Price")
+    arrival_date_raw = record.get("Arrival_Date")
     arrival_date = datetime.strptime(arrival_date_raw, "%d/%m/%Y").strftime("%Y-%m-%d")
 
 
-    sql = """
-    INSERT IGNORE INTO mandi_prices
-    (state, district, market, commodity, grade, min_price, max_price, modal_price,arrival_date)
-    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
-    """
+    sql ="""
+        INSERT INTO commodity_prices
+        (state, district, market, commodity, variety,
+        min_price, max_price, modal_price, arrival_date)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        ON CONFLICT (market, commodity, variety, arrival_date)
+        DO NOTHING
+        """
 
-    values = (state, district, market, commodity, grade, min_price, max_price, modal_price,arrival_date)
+    values = (state, district, market, commodity, variety, min_price, max_price, modal_price,arrival_date)
 
     cursor.execute(sql, values)
 

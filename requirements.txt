@@ -1,5 +1,5 @@
 flask
 flask-cors
-mysql-connector-python
+psycopg2-binary
 requests
 python-dotenv

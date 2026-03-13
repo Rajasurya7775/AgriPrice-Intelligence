@@ -5,9 +5,8 @@
 # ============================================================
 
 import requests
-from datetime import datetime
 from backend.config import (
-    GEMINI_API_KEY, GEMINI_MODEL, GEMINI_BASE_URL,
+    GEMINI_API_KEY, GEMINI_MODEL,
     OPENWEATHER_API_KEY, WEATHER_FORECAST_URL,
     WEATHER_IMPACT, TN_DISTRICTS
 )
@@ -266,15 +265,9 @@ Rules:
                 "google_search": {}
             }],
             "generationConfig": {
-<<<<<<< Updated upstream
-                "temperature"    : 1.0,
+                "temperature"    : 0.5,
                 "maxOutputTokens": 300,
                 "thinkingConfig": { "thinkingBudget": 200}
-=======
-                "temperature"    : 0.3,
-                "maxOutputTokens": 300,
-                "thinkingConfig": {"thinkingBudget": 200}
->>>>>>> Stashed changes
             }
         }
 

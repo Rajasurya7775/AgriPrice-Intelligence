@@ -1,14 +1,11 @@
-# ============================================================
-#   Daily Commodity Price Intelligence Tool
-#   app.py — Flask REST API Backend
-# ============================================================
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from backend.predict import analyse
 from backend.AI_advisory import generate_advisory, get_3day_weather, build_prompt, call_gemini , gemini_search_price
-from backend.config import TN_DISTRICTS, TN_COMMODITIES, DB_CONFIG
-import mysql.connector
+from backend.config import TN_DISTRICTS, TN_COMMODITIES, PG_CONFIG
+import psycopg2
+import requests
 import json, time, os
 
 # Create Flask app
@@ -128,7 +125,7 @@ def get_analysis():
         })
         # #endregion
 
-        # Step 2 — No MySQL data → Gemini fallback
+        # Step 2 — No data → Gemini fallback
         if not result:
             print("DEBUG — entering Gemini fallback")
             advisory = gemini_search_price(district, commodity)
@@ -159,7 +156,7 @@ def get_analysis():
                 "upcoming_festivals": []
             })
 
-        # Step 3 — MySQL data available → normal flow
+        # Step 3 — Mdata available → normal flow
         weather  = get_3day_weather(district)
         prompt   = build_prompt(result, weather)
         advisory = call_gemini(prompt)
@@ -222,34 +219,42 @@ def get_analysis():
 @app.route("/movers", methods=["GET"])
 def get_movers():
     try:
-        conn   = mysql.connector.connect(**DB_CONFIG)
-        cursor = conn.cursor(dictionary=True)
+        conn   = psycopg2.connect(**PG_CONFIG)
+        cursor = conn.cursor()
 
         cursor.execute("""
-            SELECT
-                today.commodity,
-                today.district,
-                ROUND(AVG(today.modal_price), 2)     AS today_price,
-                ROUND(AVG(yesterday.modal_price), 2) AS yesterday_price,
-                ROUND(
-                    ((AVG(today.modal_price) - AVG(yesterday.modal_price))
-                    / AVG(yesterday.modal_price)) * 100, 1
-                ) AS change_pct
-            FROM commodity_prices today
-            JOIN commodity_prices yesterday
-                ON  today.commodity = yesterday.commodity
-                AND today.district  = yesterday.district
-            WHERE today.arrival_date     = (SELECT MAX(arrival_date) FROM commodity_prices)
-            AND   yesterday.arrival_date = (SELECT MAX(arrival_date) FROM commodity_prices) - INTERVAL 1 DAY
-            AND   today.modal_price > 0
-            AND   yesterday.modal_price > 0
-            GROUP BY today.commodity, today.district
-            HAVING ABS(change_pct) > 1
-            ORDER BY change_pct DESC
-            LIMIT 20
-        """)
+                SELECT
+                    today.commodity,
+                    today.district,
+                    ROUND(AVG(today.modal_price)::numeric, 2)     AS today_price,
+                    ROUND(AVG(yesterday.modal_price)::numeric, 2) AS yesterday_price,
+                    ROUND(
+                        ((AVG(today.modal_price) - AVG(yesterday.modal_price))
+                        / AVG(yesterday.modal_price)) * 100, 1
+                    ) AS change_pct
+                FROM commodity_prices today
+                JOIN commodity_prices yesterday
+                    ON  today.commodity = yesterday.commodity
+                    AND today.district  = yesterday.district
+                WHERE today.arrival_date     = (SELECT MAX(arrival_date) FROM commodity_prices)
+                AND   yesterday.arrival_date = (SELECT MAX(arrival_date) FROM commodity_prices) - INTERVAL '1 day'
+                AND   today.modal_price > 0
+                AND   yesterday.modal_price > 0
+                GROUP BY today.commodity, today.district
+                HAVING ABS(
+                    ROUND(
+                        ((AVG(today.modal_price) - AVG(yesterday.modal_price))
+                        / AVG(yesterday.modal_price)) * 100, 1
+                    )
+                ) > 1
+                ORDER BY change_pct DESC
+                LIMIT 20
+            """)
 
-        movers = cursor.fetchall()
+        rows   = cursor.fetchall()
+        cols   = [desc[0] for desc in cursor.description]
+        movers = [dict(zip(cols, row)) for row in rows]
+
         cursor.close()
         conn.close()
 
@@ -285,8 +290,35 @@ def get_seasonal():
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
-
-
+    
+# ─────────────────────────────────────────
+#  ENDPOINT 6 — COMMODITY IMAGE
+# ─────────────────────────────────────────
+@app.route("/commodity-image", methods=["GET"])
+def get_commodity_image():
+    commodity = request.args.get("commodity", "")
+    
+    try:
+        query    = commodity.split("(")[0].strip().split()[0].lower()
+        url      = "https://api.unsplash.com/search/photos"
+        headers  = {"Authorization": f"Client-ID {os.getenv('UNSPLASH_ACCESS_KEY')}"}
+        params   = {
+            "query"      : f"{query} vegetable food",
+            "per_page"   : 1,
+            "orientation": "landscape"
+        }
+        
+        res  = requests.get(url, headers=headers, params=params)
+        data = res.json()
+        
+        if data["results"]:
+            img_url = data["results"][0]["urls"]["regular"]
+            return jsonify({"status": "success", "url": img_url})
+        else:
+            return jsonify({"status": "error", "url": None})
+            
+    except Exception as e:
+        return jsonify({"status": "error", "url": None})
 # ─────────────────────────────────────────
 #  RUN SERVER
 # ─────────────────────────────────────────

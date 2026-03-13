@@ -4,9 +4,9 @@
 #   reads from MySQL only — no live price API calls
 # ============================================================
 
-import mysql.connector
-from datetime import datetime, timedelta
-from backend.config import DB_CONFIG, TN_HARVEST, TN_FESTIVALS, WEATHER_IMPACT
+import psycopg2
+from datetime import datetime
+from backend.config import PG_CONFIG, TN_HARVEST, TN_FESTIVALS, WEATHER_IMPACT
 import json, time, os
 
 # #region agent log
@@ -33,76 +33,82 @@ def _agent_log(hypothesis_id, location, message, data=None, run_id="pre-fix"):
 # ─────────────────────────────────────────
 def get_price_history(district, commodity):
     try:
-        conn   = mysql.connector.connect(**DB_CONFIG)
-        cursor = conn.cursor(dictionary=True)
+        conn   = psycopg2.connect(**PG_CONFIG)
+        cursor = conn.cursor()
 
         # Get last 7 available days
         # Uses whatever days exist — no strict 7 day requirement
         cursor.execute("""
             SELECT
                 arrival_date,
-                ROUND(AVG(modal_price), 2) as avg_price,
-                ROUND(MIN(min_price),   2) as min_price,
-                ROUND(MAX(max_price),   2) as max_price,
-                COUNT(DISTINCT market)     as markets_count
-            FROM mandi_prices
+                ROUND(AVG(modal_price)::numeric, 2) as avg_price,
+                ROUND(MIN(min_price)::numeric,   2) as min_price,
+                ROUND(MAX(max_price)::numeric,   2) as max_price,
+                COUNT(DISTINCT market)              as markets_count
+            FROM commodity_prices
             WHERE district  LIKE %s
             AND   commodity LIKE %s
-            AND   arrival_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+            AND   arrival_date >= CURRENT_DATE - INTERVAL '7 days'
             GROUP BY arrival_date
             ORDER BY arrival_date ASC
         """, (f"%{district}%", f"%{commodity}%"))
 
         rows = cursor.fetchall()
+        cols = [desc[0] for desc in cursor.description]
+        rows = [dict(zip(cols, row)) for row in rows]
 
         # If no data in last 7 days → try last 14 days
         if not rows:
             cursor.execute("""
                 SELECT
                     arrival_date,
-                    ROUND(AVG(modal_price), 2) as avg_price,
-                    ROUND(MIN(min_price),   2) as min_price,
-                    ROUND(MAX(max_price),   2) as max_price,
-                    COUNT(DISTINCT market)     as markets_count
-                FROM mandi_prices
+                    ROUND(AVG(modal_price)::numeric, 2) as avg_price,
+                    ROUND(MIN(min_price)::numeric,   2) as min_price,
+                    ROUND(MAX(max_price)::numeric,   2) as max_price,
+                    COUNT(DISTINCT market)              as markets_count
+                FROM commodity_prices
                 WHERE district  LIKE %s
                 AND   commodity LIKE %s
-                AND   arrival_date >= DATE_SUB(CURDATE(), INTERVAL 14 DAY)
+                AND   arrival_date >= CURRENT_DATE - INTERVAL '14 days'
                 GROUP BY arrival_date
                 ORDER BY arrival_date ASC
                 LIMIT 7
             """, (f"%{district}%", f"%{commodity}%"))
             rows = cursor.fetchall()
+            cols = [desc[0] for desc in cursor.description]
+            rows = [dict(zip(cols, row)) for row in rows]
 
         # Get all markets for this district + commodity
         cursor.execute("""
             SELECT
                 market,
-                ROUND(AVG(modal_price), 2) as avg_price
+                ROUND(AVG(modal_price)::numeric, 2) as avg_price
             FROM commodity_prices
             WHERE district  LIKE %s
             AND   commodity LIKE %s
             AND   arrival_date = (
                 SELECT MAX(arrival_date)
-                FROM mandi_prices
+                FROM commodity_prices
                 WHERE district  LIKE %s
                 AND   commodity LIKE %s
             )
             GROUP BY market
             ORDER BY avg_price DESC
         """, (f"%{district}%", f"%{commodity}%",
-              f"%{district}%", f"%{commodity}%"))
+            f"%{district}%", f"%{commodity}%"))
+
         markets = cursor.fetchall()
+        cols    = [desc[0] for desc in cursor.description]
+        markets = [dict(zip(cols, row)) for row in markets]
 
         cursor.close()
         conn.close()
         return rows, markets
 
-    except mysql.connector.Error as e:
+    except Exception as e:
         print(f"❌ Database error: {e}")
         return [], []
-
-
+    
 # ─────────────────────────────────────────
 #  STEP 2 — DETECT CONFIDENCE LEVEL
 # ─────────────────────────────────────────
