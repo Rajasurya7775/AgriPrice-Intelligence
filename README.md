@@ -21,7 +21,7 @@
 
 <br/>
 
-[🔍 Features](#-features) • [🗂️ Project Structure](#-project-structure) • [⚙️ Setup Guide](#-setup-guide) • [🗄️ Database](#-database-setup) • [🚀 Run Locally](#-running-the-app) • [📊 How It Works](#-how-it-works) • [🛣️ Roadmap](#-roadmap)
+[🔍 Features](#-features) • [🗂️ Project Structure](#-project-structure) • [⚙️ Setup Guide](#-setup-guide) • [🗄️ Database](#-database-setup) • [🚀 Run Locally](#-running-the-app) • [📊 How It Works](#-how-it-works) • [🛣️ Roadmap](#-Feature-Goal)
 
 </div>
 
@@ -360,7 +360,7 @@ User selects:  User Type  +  District  +  Commodity
 
 ---
 
-## 🛣️ Roadmap
+## 🛣️ Feature-Goal
 
 - [ ] 🔐 User authentication and saved watchlists
 - [ ] 🌐 Multilingual UI (Tamil, Hindi, English)
@@ -368,18 +368,6 @@ User selects:  User Type  +  District  +  Commodity
 - [ ] 🗺️ Support for additional Indian states
 - [ ] 🤖 Automated tests for prediction logic and advisory generation
 - [ ] 📱 Progressive Web App (PWA) support for mobile use
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Here's how to get started:
-
-1. Fork this repository
-2. Create a feature branch: `git checkout -b feature/your-feature-name`
-3. Commit your changes: `git commit -m "Add: your feature description"`
-4. Push to your fork: `git push origin feature/your-feature-name`
-5. Open a Pull Request
 
 ---
 
@@ -394,10 +382,6 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 <br/>
 
 Made with ❤️ for Tamil Nadu's farming community
-
-<br/>
-
-**⭐ If this project helped you, please give it a star! It motivates continued development.**
 
 <br/>
 
