@@ -1,0 +1,32 @@
+name: Daily Price Fetch
+
+on:
+  schedule:
+    - cron: '30 0 * * *'   # 6:00 AM IST  (00:30 UTC)
+    - cron: '30 13 * * *'  # 7:00 PM IST  (13:30 UTC)
+  workflow_dispatch:         # Manual trigger ✅
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run fetch
+        env:
+          DATABASE_URL        : ${{ secrets.DATABASE_URL }}
+          AGMARKNET_API_KEY   : ${{ secrets.AGMARKNET_API_KEY }}
+          OPENWEATHER_API_KEY : ${{ secrets.OPENWEATHER_API_KEY }}
+          GEMINI_API_KEY      : ${{ secrets.GEMINI_API_KEY }}
+        run: python backend/fetch_prices.py
+`
