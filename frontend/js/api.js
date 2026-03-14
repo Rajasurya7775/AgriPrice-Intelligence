@@ -3,7 +3,7 @@
 //   api.js — All API calls in one place
 // ============================================================
 
-const API_BASE      = "http://127.0.0.1:5000";
+const API_BASE      = "https://agriprice-intelligence.onrender.com";
 
 // #region agent log
 function __agentLog(hypothesisId, location, message, data = {}) {
