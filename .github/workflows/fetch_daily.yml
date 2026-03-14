@@ -27,3 +27,4 @@ jobs:
           DATABASE_URL      : ${{ secrets.DATABASE_URL }}
           AGMARKNET_API_KEY : ${{ secrets.AGMARKNET_API_KEY }}
         run: python backend/fetch_prices.py
+        working-directory: ${{ github.workspace }}

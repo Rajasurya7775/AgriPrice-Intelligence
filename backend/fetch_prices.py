@@ -1,8 +1,11 @@
 import requests
-from backend.config import AGMARKNET_API_KEY,AGMARKNET_BASE_URL,get_db
 from datetime import datetime
 import psycopg2
 import io
+try:
+    from backend.config import AGMARKNET_API_KEY, AGMARKNET_BASE_URL, get_db
+except ImportError:
+    from config import AGMARKNET_API_KEY, AGMARKNET_BASE_URL, get_db
 
 
 # -----------------------
