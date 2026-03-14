@@ -26,7 +26,5 @@ jobs:
         env:
           DATABASE_URL        : ${{ secrets.DATABASE_URL }}
           AGMARKNET_API_KEY   : ${{ secrets.AGMARKNET_API_KEY }}
-          OPENWEATHER_API_KEY : ${{ secrets.OPENWEATHER_API_KEY }}
-          GEMINI_API_KEY      : ${{ secrets.GEMINI_API_KEY }}
         run: python backend/fetch_prices.py
 `
