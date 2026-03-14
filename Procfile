@@ -1,0 +1,1 @@
+web: gunicorn backend.app:appgit add Procfile
