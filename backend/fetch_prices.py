@@ -1,7 +1,9 @@
 import requests
-from backend.config import AGMARKNET_API_KEY,AGMARKNET_BASE_URL,PG_CONFIG
+from backend.config import AGMARKNET_API_KEY,AGMARKNET_BASE_URL,get_db
 from datetime import datetime
 import psycopg2
+import io
+
 
 # -----------------------
 # API CONFIG
@@ -15,15 +17,14 @@ params = {
     "api-key": API_KEY,
     "format": "json",
     "limit": 9999,
-    "filters[State]": "Tamil Nadu",
-    "filters[Arrival_Date]": "07/03/2026"
+    "filters[state.keyword]": "Tamil Nadu"
     
 }
 
 # -----------------------
 # POSTGRESQL CONNECTION
 # -----------------------
-db     = psycopg2.connect(**PG_CONFIG)
+db = get_db()
 cursor = db.cursor()
 
 # -----------------------
@@ -51,76 +52,73 @@ records = data["records"]
 
 
 print("Total records:", len(records))
-print("Data inserted successfully")
 
+
+buffer = io.StringIO()
+
+for r in records:
+
+    arrival_date_raw = r.get("arrival_date")
+
+    try:
+        arrival_date = datetime.strptime(
+            arrival_date_raw, "%d/%m/%Y"
+        ).strftime("%Y-%m-%d")
+    except:
+        continue
+
+    buffer.write(
+        f"{r.get('state')},{r.get('district')},{r.get('market')},{r.get('commodity')},{r.get('variety')},{r.get('min_price')},{r.get('max_price')},{r.get('modal_price')},{arrival_date}\n"
+    )
+
+buffer.seek(0)
+
+print(records[0])
 
 # -----------------------
-# INSERT INTO MYSQL
+# FAST INSERT (COPY)
 # -----------------------
-fetch_success = False
 
-# INSERT loop
-inserted = 0
-for record in records:
+print("Inserting data...")
 
-    state = record.get("State")
-    district = record.get("District")
-    market = record.get("Market")
-    commodity = record.get("Commodity")
-    variety = record.get("Variety")
-    min_price = record.get("Min_Price")
-    max_price = record.get("Max_Price")
-    modal_price = record.get("Modal_Price")
-    arrival_date_raw = record.get("Arrival_Date")
-    arrival_date = datetime.strptime(arrival_date_raw, "%d/%m/%Y").strftime("%Y-%m-%d")
-
-
-    sql ="""
-        INSERT INTO commodity_prices
-        (state, district, market, commodity, variety,
-        min_price, max_price, modal_price, arrival_date)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
-        ON CONFLICT (market, commodity, variety, arrival_date)
-        DO NOTHING
-        """
-
-    values = (state, district, market, commodity, variety, min_price, max_price, modal_price,arrival_date)
-
-    cursor.execute(sql, values)
-    inserted += 1
+cursor.copy_expert("""
+COPY commodity_prices
+(state,district,market,commodity,variety,
+min_price,max_price,modal_price,arrival_date)
+FROM STDIN WITH CSV
+""", buffer)
 
 db.commit()
+
+print("Insert completed")
+
 cursor.close()
 db.close()
-print(f"✅ Inserted {inserted} records")
-
 # -----------------------
 # SLIDING WINDOW CLEANUP
 # Only runs if fetch successful
-# -----------------------
-if inserted > 1000:  # Arbitrary threshold to confirm data was inserted
-    try:
-        db     = psycopg2.connect(**PG_CONFIG)
-        cursor = db.cursor()
+# ----------------------- 
+try:
+    from backend.config import get_db
+    db = get_db()
+    cursor = db.cursor()
 
-        cursor.execute("""
-            DELETE FROM commodity_prices
-            WHERE arrival_date < CURRENT_DATE - INTERVAL '6 days'
-        """)
+    cursor.execute("""
+        DELETE FROM commodity_prices
+        WHERE arrival_date < CURRENT_DATE - INTERVAL '6 days'
+    """)
 
-        deleted = cursor.rowcount
-        db.commit()
-        cursor.close()
-        db.close()
+    deleted = cursor.rowcount
+    db.commit()
+    cursor.close()
+    db.close()
 
-        print(f"🗑️  Deleted {deleted} old records")
-        print(f"✅  DB now has last 7 days only")
+    print(f"🗑️  Deleted {deleted} old records")
+    print(f"✅  DB now has last 7 days only")
 
-    except Exception as e:
-        print(f"⚠️  Cleanup failed: {e}")
-
-else:
-    print("⚠️  No records inserted — skipping cleanup")
-    print("✅  Old data preserved in DB")
+except Exception as e:
+    print(f"⚠️  Cleanup failed: {e}")
 
 print("✅ Done!")
+
+

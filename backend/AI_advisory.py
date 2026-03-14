@@ -295,7 +295,7 @@ def generate_advisory(prediction_data):
 
     # ── If no price history → use Gemini search ──
     if not prediction_data.get("prices"):
-        print("\n⚠️  No MySQL data — using Gemini web search...")
+        print("\n⚠️  No DB data — using Gemini web search...")
         district  = prediction_data.get("district", "")
         commodity = prediction_data.get("commodity", "")
         result    = gemini_search_price(district, commodity)

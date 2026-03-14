@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from backend.predict import analyse
 from backend.AI_advisory import generate_advisory, get_3day_weather, build_prompt, call_gemini , gemini_search_price
-from backend.config import TN_DISTRICTS, TN_COMMODITIES, PG_CONFIG
+from backend.config import TN_DISTRICTS, TN_COMMODITIES, get_db
 import psycopg2
 import requests
 import json, time, os
@@ -219,7 +219,7 @@ def get_analysis():
 @app.route("/movers", methods=["GET"])
 def get_movers():
     try:
-        conn   = psycopg2.connect(**PG_CONFIG)
+        conn = get_db()
         cursor = conn.cursor()
 
         cursor.execute("""

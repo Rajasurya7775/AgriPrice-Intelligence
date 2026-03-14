@@ -6,7 +6,7 @@
 
 import psycopg2
 from datetime import datetime
-from backend.config import PG_CONFIG, TN_HARVEST, TN_FESTIVALS, WEATHER_IMPACT
+from backend.config import TN_HARVEST, TN_FESTIVALS, WEATHER_IMPACT , get_db
 import json, time, os
 
 # #region agent log
@@ -33,7 +33,7 @@ def _agent_log(hypothesis_id, location, message, data=None, run_id="pre-fix"):
 # ─────────────────────────────────────────
 def get_price_history(district, commodity):
     try:
-        conn   = psycopg2.connect(**PG_CONFIG)
+        conn = get_db()
         cursor = conn.cursor()
 
         # Get last 7 available days
@@ -447,3 +447,6 @@ def interactive_mode():
 # ─────────────────────────────────────────
 if __name__ == "__main__":
     interactive_mode()
+
+
+

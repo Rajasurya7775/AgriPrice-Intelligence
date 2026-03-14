@@ -1,29 +1,47 @@
 import os
 from dotenv import load_dotenv
-
 load_dotenv()
 
-AGMARKNET_API_KEY   = os.getenv("AGMARKNET_API_KEY")
-OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
-GEMINI_API_KEY      = os.getenv("GEMINI_API_KEY")
 
-PG_CONFIG = {
-    "host"    : os.getenv("PG_HOST",     "localhost"),
-    "port"    : os.getenv("PG_PORT",     "5432"),
-    "user"    : os.getenv("PG_USER",     "postgres"),
-    "password": os.getenv("PG_PASSWORD", ""),
-    "dbname"  : os.getenv("PG_DATABASE", "commodity_intelligence")
-}
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if DATABASE_URL:
+    # Cloud PostgreSQL (Render)
+    import psycopg2
+    def get_db():
+        return psycopg2.connect(DATABASE_URL)
+else:
+    # Local PostgreSQL
+    PG_CONFIG = {
+        "host"    : os.getenv("PG_HOST",     "localhost"),
+        "port"    : os.getenv("PG_PORT",     "5432"),
+        "user"    : os.getenv("PG_USER",     "postgres"),
+        "password": os.getenv("PG_PASSWORD", ""),
+        "dbname"  : os.getenv("PG_DATABASE", "commodity_intelligence")
+    }
+    def get_db():
+        import psycopg2
+        return psycopg2.connect(**PG_CONFIG)
+    
 
 # ─────────────────────────────────────────
 #  AGMARKNET API
 # ─────────────────────────────────────────
-AGMARKNET_BASE_URL = "https://api.data.gov.in/resource/35985678-0d79-46b4-9ed6-6f13308a1d24"
+AGMARKNET_API_KEY   = os.getenv("AGMARKNET_API_KEY")
+AGMARKNET_BASE_URL = "https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070"
+
+# ─────────────────────────────────────────
+#  GEMINI AI
+# ─────────────────────────────────────────
+GEMINI_API_KEY      = os.getenv("GEMINI_API_KEY")
+GEMINI_MODEL    = "gemini-2.5-flash"
+GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 
 
 # ─────────────────────────────────────────
 #  OPENWEATHERMAP API
 # ─────────────────────────────────────────
+OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 WEATHER_BASE_URL     = "https://api.openweathermap.org/data/2.5/weather"
 WEATHER_FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast"
 
@@ -182,10 +200,4 @@ WEATHER_IMPACT = {
 }
 
 
-
-# ─────────────────────────────────────────
-#  GEMINI AI
-# ─────────────────────────────────────────
-GEMINI_MODEL    = "gemini-2.5-flash"
-GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 
