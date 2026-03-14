@@ -2,9 +2,9 @@ name: Daily Price Fetch
 
 on:
   schedule:
-    - cron: '30 0 * * *'   # 6:00 AM IST  (00:30 UTC)
-    - cron: '30 13 * * *'  # 7:00 PM IST  (13:30 UTC)
-  workflow_dispatch:         # Manual trigger ✅
+    - cron: '30 0 * * *'   # 6:00 AM IST
+    - cron: '30 13 * * *'  # 7:00 PM IST
+  workflow_dispatch:         # Manual trigger
 
 jobs:
   fetch:
@@ -24,7 +24,6 @@ jobs:
 
       - name: Run fetch
         env:
-          DATABASE_URL        : ${{ secrets.DATABASE_URL }}
-          AGMARKNET_API_KEY   : ${{ secrets.AGMARKNET_API_KEY }}
+          DATABASE_URL      : ${{ secrets.DATABASE_URL }}
+          AGMARKNET_API_KEY : ${{ secrets.AGMARKNET_API_KEY }}
         run: python backend/fetch_prices.py
-`
