@@ -1,7 +1,9 @@
 import requests
-from datetime import datetime
 import psycopg2
 import io
+import csv
+from datetime import datetime
+
 try:
     from backend.config import AGMARKNET_API_KEY, AGMARKNET_BASE_URL, get_db
 except ImportError:
@@ -12,116 +14,139 @@ except ImportError:
 # API CONFIG
 # -----------------------
 
-API_KEY =AGMARKNET_API_KEY
+API_KEY = AGMARKNET_API_KEY
+URL = AGMARKNET_BASE_URL
 
-url = AGMARKNET_BASE_URL
 
 params = {
     "api-key": API_KEY,
     "format": "json",
     "limit": 9999,
     "filters[state.keyword]": "Tamil Nadu"
-    
 }
 
-# -----------------------
-# POSTGRESQL CONNECTION
-# -----------------------
-db = get_db()
-cursor = db.cursor()
 
 # -----------------------
 # FETCH DATA
 # -----------------------
 
+print("Fetching mandi data...")
+
 try:
-    response = requests.get(url, params=params, timeout=60)
-    response.raise_for_status()  # Raise an exception for bad status codes
+    response = requests.get(URL, params=params, timeout=60)
+    response.raise_for_status()
+
     data = response.json()
-    print(f"API Response Status: {response.status_code}")
-    print(f"Records found: {len(data.get('records', []))}")
-except requests.exceptions.RequestException as e:
-    print(f"❌ API Request failed: {e}")
-    print(f"URL: {url}")
-    print(f"Params: {params}")
-    exit(1)
-except ValueError as e:
-    print(f"❌ JSON parsing failed: {e}")
-    print(f"Response text: {response.text[:500]}")
-    exit(1)
+    records = data.get("records", [])
+
+    print(f"Records received: {len(records)}")
+
+except Exception as e:
+    print("❌ API fetch failed:", e)
+    exit()
 
 
-records = data["records"]
-
-
-print("Total records:", len(records))
-
+# -----------------------
+# CREATE CSV BUFFER
+# -----------------------
 
 buffer = io.StringIO()
+writer = csv.writer(buffer)
 
 for r in records:
 
-    arrival_date_raw = r.get("arrival_date")
-
     try:
         arrival_date = datetime.strptime(
-            arrival_date_raw, "%d/%m/%Y"
+            r.get("arrival_date"),
+            "%d/%m/%Y"
         ).strftime("%Y-%m-%d")
     except:
         continue
 
-    buffer.write(
-        f"{r.get('state')},{r.get('district')},{r.get('market')},{r.get('commodity')},{r.get('variety')},{r.get('min_price')},{r.get('max_price')},{r.get('modal_price')},{arrival_date}\n"
-    )
+    writer.writerow([
+        r.get("state"),
+        r.get("district"),
+        r.get("market"),
+        r.get("commodity"),
+        r.get("variety"),
+        r.get("min_price"),
+        r.get("max_price"),
+        r.get("modal_price"),
+        arrival_date
+    ])
 
 buffer.seek(0)
 
-print(records[0])
 
 # -----------------------
-# FAST INSERT (COPY)
+# INSERT INTO DATABASE
 # -----------------------
 
-print("Inserting data...")
+print("Connecting to database...")
 
-cursor.copy_expert("""
-COPY commodity_prices
-(state,district,market,commodity,variety,
-min_price,max_price,modal_price,arrival_date)
-FROM STDIN WITH CSV
-""", buffer)
+db = get_db()
+cursor = db.cursor()
 
-db.commit()
-
-print("Insert completed")
-
-cursor.close()
-db.close()
-# -----------------------
-# SLIDING WINDOW CLEANUP
-# Only runs if fetch successful
-# ----------------------- 
 try:
-    from backend.config import get_db
+
+    # Fix sequence mismatch
+    cursor.execute("""
+    SELECT setval(
+        'commodity_prices_id_seq',
+        COALESCE((SELECT MAX(id) FROM commodity_prices),1)
+    )
+    """)
+
+    print("Inserting data...")
+
+    cursor.copy_expert("""
+    COPY commodity_prices
+    (state,district,market,commodity,variety,
+    min_price,max_price,modal_price,arrival_date)
+    FROM STDIN WITH CSV
+    """, buffer)
+
+    db.commit()
+
+    print("✅ Insert completed")
+
+except Exception as e:
+
+    db.rollback()
+    print("❌ Insert failed:", e)
+
+finally:
+    cursor.close()
+    db.close()
+
+
+# -----------------------
+# CLEAN OLD DATA
+# -----------------------
+
+print("Cleaning old records...")
+
+try:
+
     db = get_db()
     cursor = db.cursor()
 
     cursor.execute("""
-        DELETE FROM commodity_prices
-        WHERE arrival_date < CURRENT_DATE - INTERVAL '6 days'
+    DELETE FROM commodity_prices
+    WHERE arrival_date < CURRENT_DATE - INTERVAL '7 days'
     """)
 
     deleted = cursor.rowcount
     db.commit()
+
     cursor.close()
     db.close()
 
-    print(f"🗑️  Deleted {deleted} old records")
-    print(f"✅  DB now has last 7 days only")
+    print(f"🗑 Deleted {deleted} old rows")
 
 except Exception as e:
-    print(f"⚠️  Cleanup failed: {e}")
 
-print("✅ Done!")
+    print("⚠ Cleanup failed:", e)
 
 
+print("✅ Pipeline completed")
