@@ -341,82 +341,84 @@ User selects:  User Type  +  District  +  Commodity
 
 # 🚢 Full-Stack AI Advisory System
 
-A cloud-deployed full-stack application integrating **Flask**, **NeonDB (PostgreSQL)**, and **Google Gemini API** for real-time AI-powered advisory services.
+  A cloud-deployed full-stack application integrating **Flask**, **NeonDB (PostgreSQL)**, and **Google Gemini API** for real-time AI-powered advisory services.
 
----
+  ---
 
-## 🧠 Overview
-- Backend + Frontend hosted on **Render**
-- Database hosted on **NeonDB (Serverless PostgreSQL)**
-- AI Layer powered by **Google Gemini API**
-- Data Sources: **Agmarknet + OpenWeather**
+  ## 🧠 Overview
+  - Backend + Frontend hosted on **Render**
+  - Database hosted on **NeonDB (Serverless PostgreSQL)**
+  - AI Layer powered by **Google Gemini API**
+  - Data Sources: **Agmarknet + OpenWeather**
 
-⚠️ **First Load Delay**  
-The app may take **20–30 seconds** to load initially due to Render free-tier cold start.  
-Subsequent requests are fast ⚡.
+  ⚠️ **First Load Delay**  
+  The app may take **20–30 seconds** to load initially due to Render free-tier cold start.  
+  Subsequent requests are fast ⚡.
 
----
+  ---
 
-## 🏗️ Architecture
-User Browser
-↓
-Render (Flask Backend + Frontend UI)
-↓
-NeonDB (Serverless PostgreSQL)
+  ## 🏗️ Architecture
+  User Browser
+  ↓
+  Render (Flask Backend + Frontend UI)
+  ↓
+  NeonDB (Serverless PostgreSQL)
 
-Code
+  Code
 
----
+  ---
 
-## 🔹 Tech Stack
-- 🌐 Backend: Flask (Python) deployed on Render  
-- 🎨 Frontend: Static SPA served via Flask  
-- 🗄️ Database: NeonDB (PostgreSQL Cloud)  
-- 🤖 AI Layer: Google Gemini API  
-- 📡 Data Source: Agmarknet + OpenWeather  
+  ## 🔹 Tech Stack
+  - 🌐 Backend: Flask (Python) deployed on Render  
+  - 🎨 Frontend: Static SPA served via Flask  
+  - 🗄️ Database: NeonDB (PostgreSQL Cloud)  
+  - 🤖 AI Layer: Google Gemini API  
+  - 📡 Data Source: Agmarknet + OpenWeather  
 
----
+  ---
 
-## ⚙️ Deployment Workflow
+  ## ⚙️ Deployment Workflow
 
-### 1️⃣ Render Deployment
-- Push code to GitHub  
-- Create Web Service in Render  
-- Connect repo  
+  ### 1️⃣ Render Deployment
+  - Push code to GitHub  
+  - Create Web Service in Render  
+  - Connect repo  
 
-**Configuration:**
-```bash
-Build Command: pip install -r requirements.txt
-Start Command: python backend/app.py
-Add environment variables
+  **Configuration:**
+  ```bash
+  Build Command: pip install -r requirements.txt
+  Start Command: python backend/app.py
+  Add environment variables
 
-Deploy 🚀
+  Deploy 🚀
 
-2️⃣ NeonDB Setup
-Create PostgreSQL project in Neon
+  2️⃣ NeonDB Setup
+  Create PostgreSQL project in Neon
 
-Copy connection string
+  Copy connection string
 
-Replace local DB config:
+  Replace local DB config:
 
-python
-SQLALCHEMY_DATABASE_URI = "your_neon_connection_url"
-Install driver:
+  python
+  SQLALCHEMY_DATABASE_URI = "your_neon_connection_url"
+  Install driver:
 
-bash
-pip install psycopg2-binary
-3️⃣ Integration
-✔ Render ↔ NeonDB connected
-✔ API working in production
-✔ AI advisory functional
-✔ Real-time data flow enabled
+  bash
+  pip install psycopg2-binary
+  3️⃣ Integration
+  ✔ Render ↔ NeonDB connected
+  ✔ API working in production
+  ✔ AI advisory functional
+  ✔ Real-time data flow enabled
 
-📌 Production Notes
-Uses free-tier cloud services
+  📌 Production Notes
+  Uses free-tier cloud services
 
-Cold start delay on first request
+  Cold start delay on first request
 
-Designed for demo, academic, and scalable prototype use
+  Designed for demo, academic, and scalable prototype use
+
+----
 
 ## 🛣️ Feature-Goal
 
