@@ -123,25 +123,55 @@ TN_COMMODITIES = [
 ]
 
 TN_FESTIVALS = [
-    {"name": "New Year's Day",       "date": "01-01", "days_impact": 3, "demand": "HIGH",   "mandi_closed": True},
-    {"name": "Thai Pongal",          "date": "01-15", "days_impact": 5, "demand": "HIGH",   "mandi_closed": True},
-    {"name": "Thiruvalluvar Day",    "date": "01-16", "days_impact": 2, "demand": "MEDIUM", "mandi_closed": True},
-    {"name": "Uzhavar Thirunal",     "date": "01-17", "days_impact": 2, "demand": "MEDIUM", "mandi_closed": True},
-    {"name": "Republic Day",         "date": "01-26", "days_impact": 1, "demand": "LOW",    "mandi_closed": True},
-    {"name": "Thai Poosam",          "date": "02-01", "days_impact": 2, "demand": "MEDIUM", "mandi_closed": True},
-    {"name": "Ramzan (Eid ul-Fitr)", "date": "03-21", "days_impact": 4, "demand": "HIGH",   "mandi_closed": True},
-    {"name": "Mahaveer Jayanthi",    "date": "03-31", "days_impact": 1, "demand": "LOW",    "mandi_closed": True},
-    {"name": "Good Friday",          "date": "04-03", "days_impact": 2, "demand": "MEDIUM", "mandi_closed": True},
-    {"name": "Tamil New Year",       "date": "04-14", "days_impact": 4, "demand": "HIGH",   "mandi_closed": True},
-    {"name": "May Day",              "date": "05-01", "days_impact": 2, "demand": "MEDIUM", "mandi_closed": True},
-    {"name": "Independence Day",     "date": "08-15", "days_impact": 2, "demand": "MEDIUM", "mandi_closed": True},
-    {"name": "Vinayagar Chathurthi", "date": "09-14", "days_impact": 3, "demand": "HIGH",   "mandi_closed": True},
-    {"name": "Ayudha Poojai",        "date": "10-19", "days_impact": 3, "demand": "HIGH",   "mandi_closed": True},
-    {"name": "Vijayadasami",         "date": "10-20", "days_impact": 2, "demand": "HIGH",   "mandi_closed": True},
-    {"name": "Deepavali",            "date": "11-08", "days_impact": 5, "demand": "HIGH",   "mandi_closed": True},
-    {"name": "Christmas",            "date": "12-25", "days_impact": 3, "demand": "MEDIUM", "mandi_closed": True},
-]
+    # JANUARY
+    {"name": "New Year's Day", "date": "01-01", "days_impact": 3, "demand": "HIGH", "mandi_closed": True},
+    {"name": "Bhogi", "date": "01-14", "days_impact": 2, "demand": "HIGH", "mandi_closed": True},
+    {"name": "Thai Pongal", "date": "01-15", "days_impact": 5, "demand": "VERY_HIGH", "mandi_closed": True},
+    {"name": "Mattu Pongal", "date": "01-16", "days_impact": 3, "demand": "HIGH", "mandi_closed": True},
+    {"name": "Kaanum Pongal", "date": "01-17", "days_impact": 3, "demand": "HIGH", "mandi_closed": True},
+    {"name": "Republic Day", "date": "01-26", "days_impact": 1, "demand": "LOW", "mandi_closed": True},
 
+    # FEBRUARY
+    {"name": "Thai Poosam", "date": "02-01", "days_impact": 3, "demand": "HIGH", "mandi_closed": True},
+    {"name": "Masi Magam", "date": "02-25", "days_impact": 2, "demand": "MEDIUM", "mandi_closed": False},
+
+    # MARCH
+    {"name": "Panguni Uthiram", "date": "03-25", "days_impact": 3, "demand": "HIGH", "mandi_closed": True},
+    {"name": "Ramzan (Eid ul-Fitr)", "date": "VARIES", "days_impact": 4, "demand": "HIGH", "mandi_closed": True},
+    {"name": "Mahaveer Jayanthi", "date": "03-31", "days_impact": 1, "demand": "LOW", "mandi_closed": True},
+
+    # APRIL
+    {"name": "Good Friday", "date": "VARIES", "days_impact": 2, "demand": "MEDIUM", "mandi_closed": True},
+    {"name": "Tamil New Year", "date": "04-14", "days_impact": 4, "demand": "VERY_HIGH", "mandi_closed": True},
+    {"name": "Chitra Pournami", "date": "04-23", "days_impact": 2, "demand": "MEDIUM", "mandi_closed": False},
+
+    # MAY
+    {"name": "May Day", "date": "05-01", "days_impact": 2, "demand": "MEDIUM", "mandi_closed": True},
+    {"name": "Vaikasi Visakam", "date": "05-25", "days_impact": 2, "demand": "MEDIUM", "mandi_closed": False},
+
+    # JUNE
+    {"name": "Aadi Perukku", "date": "08-03", "days_impact": 2, "demand": "HIGH", "mandi_closed": False},
+
+    # JULY–AUGUST
+    {"name": "Aadi Amavasai", "date": "07-30", "days_impact": 2, "demand": "MEDIUM", "mandi_closed": False},
+    {"name": "Krishna Jayanthi", "date": "08-16", "days_impact": 2, "demand": "HIGH", "mandi_closed": True},
+    {"name": "Independence Day", "date": "08-15", "days_impact": 1, "demand": "LOW", "mandi_closed": True},
+
+    # SEPTEMBER
+    {"name": "Vinayagar Chathurthi", "date": "09-14", "days_impact": 4, "demand": "VERY_HIGH", "mandi_closed": True},
+    {"name": "Muharram", "date": "VARIES", "days_impact": 2, "demand": "LOW", "mandi_closed": True},
+
+    # OCTOBER
+    {"name": "Ayudha Poojai", "date": "10-19", "days_impact": 3, "demand": "VERY_HIGH", "mandi_closed": True},
+    {"name": "Vijayadasami", "date": "10-20", "days_impact": 2, "demand": "HIGH", "mandi_closed": True},
+
+    # NOVEMBER
+    {"name": "Deepavali", "date": "VARIES", "days_impact": 5, "demand": "VERY_HIGH", "mandi_closed": True},
+    {"name": "Karthigai Deepam", "date": "11-25", "days_impact": 3, "demand": "HIGH", "mandi_closed": True},
+
+    # DECEMBER
+    {"name": "Christmas", "date": "12-25", "days_impact": 3, "demand": "MEDIUM", "mandi_closed": True},
+]
 # ─────────────────────────────────────────
 #  TAMIL NADU HARVEST CALENDAR
 # ─────────────────────────────────────────

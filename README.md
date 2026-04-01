@@ -339,26 +339,84 @@ User selects:  User Type  +  District  +  Commodity
 
 ---
 
-## 🚢 Deployment Notes
+# 🚢 Full-Stack AI Advisory System
 
-### Backend
-
-- Use a production WSGI server like **Gunicorn** behind **Nginx**:
-  ```bash
-  gunicorn -w 4 -b 0.0.0.0:5000 backend.app:app
-  ```
-- Set all environment variables on the server directly — avoid using `.env` in production
-- Restrict database credentials and API key access
-
-### Frontend
-
-- The frontend is a **static site** — host it anywhere:
-  - GitHub Pages
-  - Netlify
-  - AWS S3 + CloudFront
-- After deploying the backend, update `API_BASE` in `frontend/js/api.js` to point to your deployed backend URL
+A cloud-deployed full-stack application integrating **Flask**, **NeonDB (PostgreSQL)**, and **Google Gemini API** for real-time AI-powered advisory services.
 
 ---
+
+## 🧠 Overview
+- Backend + Frontend hosted on **Render**
+- Database hosted on **NeonDB (Serverless PostgreSQL)**
+- AI Layer powered by **Google Gemini API**
+- Data Sources: **Agmarknet + OpenWeather**
+
+⚠️ **First Load Delay**  
+The app may take **20–30 seconds** to load initially due to Render free-tier cold start.  
+Subsequent requests are fast ⚡.
+
+---
+
+## 🏗️ Architecture
+User Browser
+↓
+Render (Flask Backend + Frontend UI)
+↓
+NeonDB (Serverless PostgreSQL)
+
+Code
+
+---
+
+## 🔹 Tech Stack
+- 🌐 Backend: Flask (Python) deployed on Render  
+- 🎨 Frontend: Static SPA served via Flask  
+- 🗄️ Database: NeonDB (PostgreSQL Cloud)  
+- 🤖 AI Layer: Google Gemini API  
+- 📡 Data Source: Agmarknet + OpenWeather  
+
+---
+
+## ⚙️ Deployment Workflow
+
+### 1️⃣ Render Deployment
+- Push code to GitHub  
+- Create Web Service in Render  
+- Connect repo  
+
+**Configuration:**
+```bash
+Build Command: pip install -r requirements.txt
+Start Command: python backend/app.py
+Add environment variables
+
+Deploy 🚀
+
+2️⃣ NeonDB Setup
+Create PostgreSQL project in Neon
+
+Copy connection string
+
+Replace local DB config:
+
+python
+SQLALCHEMY_DATABASE_URI = "your_neon_connection_url"
+Install driver:
+
+bash
+pip install psycopg2-binary
+3️⃣ Integration
+✔ Render ↔ NeonDB connected
+✔ API working in production
+✔ AI advisory functional
+✔ Real-time data flow enabled
+
+📌 Production Notes
+Uses free-tier cloud services
+
+Cold start delay on first request
+
+Designed for demo, academic, and scalable prototype use
 
 ## 🛣️ Feature-Goal
 

@@ -24,11 +24,6 @@ params = {
     "limit": 9999,
     "filters[state.keyword]": "Tamil Nadu"
 }
-
-headers = {
-    "User-Agent": "Mozilla/5.0",
-    "Accept": "application/json"
-}
 # -----------------------
 # FETCH DATA
 # -----------------------
@@ -36,7 +31,7 @@ headers = {
 print("Fetching mandi data...")
 
 try:
-    response = requests.get(URL, params=params,headers=headers,timeout=60)
+    response = requests.get(URL, params=params,timeout=60)
     response.raise_for_status()
 
     data = response.json()
