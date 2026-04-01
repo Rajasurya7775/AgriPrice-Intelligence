@@ -384,7 +384,7 @@ User selects:  User Type  +  District  +  Commodity
   - Create Web Service in Render  
   - Connect repo  
 
-  **Configuration:**
+  Configuration:
   ```bash
   Build Command: pip install -r requirements.txt
   Start Command: python backend/app.py
@@ -392,7 +392,7 @@ User selects:  User Type  +  District  +  Commodity
 
   Deploy 🚀
 
-  2️⃣ NeonDB Setup
+  ### 2️⃣ NeonDB Setup
   Create PostgreSQL project in Neon
 
   Copy connection string
@@ -405,7 +405,7 @@ User selects:  User Type  +  District  +  Commodity
 
   bash
   pip install psycopg2-binary
-  3️⃣ Integration
+  ### 3️⃣ Integration
   ✔ Render ↔ NeonDB connected
   ✔ API working in production
   ✔ AI advisory functional
