@@ -384,12 +384,6 @@ User selects:  User Type  +  District  +  Commodity
   - Create Web Service in Render  
   - Connect repo  
 
-  Configuration:
-  ```bash
-  Build Command: pip install -r requirements.txt
-  Start Command: python backend/app.py
-  Add environment variables
-
   Deploy 🚀
 
   ### 2️⃣ NeonDB Setup
