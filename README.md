@@ -8,6 +8,17 @@
 
 <br/><br/>
 
+<a href="https://agriprice-intelligence-1.onrender.com" target="_blank">
+  🌐 **Live Demo Here**
+</a>
+
+⚠️ **First Load Delay**  
+  The app may take **20–30 seconds** to load initially due to Render free-tier cold start.  
+  Subsequent requests are fast ⚡.
+
+
+<br/><br/>
+
 <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" />
 <img alt="Flask" src="https://img.shields.io/badge/Flask-Backend-000000?style=for-the-badge&logo=flask&logoColor=white" />
 <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-Database-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" />
@@ -16,6 +27,7 @@
 <img alt="License" src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" />
 
 <br/><br/>
+
 
 > 🚜 **Empowering Tamil Nadu's farming ecosystem** with real-time mandi prices, AI-driven advisories, weather insights, and harvest intelligence — all in one place.
 
@@ -350,11 +362,6 @@ User selects:  User Type  +  District  +  Commodity
   - Database hosted on **NeonDB (Serverless PostgreSQL)**
   - AI Layer powered by **Google Gemini API**
   - Data Sources: **Agmarknet + OpenWeather**
-
-  ⚠️ **First Load Delay**  
-  The app may take **20–30 seconds** to load initially due to Render free-tier cold start.  
-  Subsequent requests are fast ⚡.
-
   ---
 
   ## 🏗️ Architecture
