@@ -5,18 +5,13 @@
 <br/>
 
 <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=18&pause=1000&color=22C55E&center=true&vCenter=true&width=600&lines=Smart+BUY+%2F+SELL+%2F+HOLD+decisions;Real-time+Mandi+Price+Intelligence;AI-powered+Agricultural+Advisory;Built+for+Farmers%2C+Traders+%26+Consumers" alt="Typing SVG" />
-
 <br/><br/>
-
 <a href="https://agriprice-intelligence-1.onrender.com" target="_blank">
   🌐 **Live Demo Here**
 </a>
-
 ⚠️ **First Load Delay**  
   The app may take **20–30 seconds** to load initially due to Render free-tier cold start.  
   Subsequent requests are fast ⚡.
-
-
 <br/><br/>
 
 <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" />
