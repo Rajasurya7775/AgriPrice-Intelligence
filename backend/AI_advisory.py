@@ -16,7 +16,6 @@ from backend.config import (
 # ─────────────────────────────────────────
 def get_3day_weather(district):
     try:
-        # Find coordinates
         coords = None
         for key in TN_DISTRICTS:
             if key.lower() in district.lower() or district.lower() in key.lower():
@@ -31,7 +30,7 @@ def get_3day_weather(district):
             "lon"  : coords["lon"],
             "appid": OPENWEATHER_API_KEY,
             "units": "metric",
-            "cnt"  : 24        # 24 slots = 3 full days
+            "cnt"  : 24
         }
 
         response = requests.get(WEATHER_FORECAST_URL, params=params, timeout=10)
@@ -45,11 +44,10 @@ def get_3day_weather(district):
         if not forecast:
             return None
 
-        # ── Group by date → one summary per day ──
         daily = {}
 
         for slot in forecast:
-            date = slot["dt_txt"].split(" ")[0]  # extract date part
+            date = slot["dt_txt"].split(" ")[0]
 
             if date not in daily:
                 daily[date] = {
@@ -65,22 +63,17 @@ def get_3day_weather(district):
             daily[date]["humidity"].append(slot["main"]["humidity"])
             daily[date]["conditions"].append(slot["weather"][0]["main"])
 
-            # Accumulate rainfall
             if "rain" in slot:
                 daily[date]["rainfall_mm"] += slot["rain"].get("3h", 0.0)
 
-        # ── Build clean summary for each day ──
         result = []
-        for date, d in sorted(daily.items())[:3]:  # only 3 days
+        for date, d in sorted(daily.items())[:3]:
 
             avg_temp     = round(sum(d["temps"])    / len(d["temps"]),    1)
             avg_humidity = round(sum(d["humidity"]) / len(d["humidity"]), 1)
             rainfall     = round(d["rainfall_mm"], 2)
+            condition    = max(set(d["conditions"]), key=d["conditions"].count)
 
-            # Most common condition
-            condition = max(set(d["conditions"]), key=d["conditions"].count)
-
-            # Check alerts
             alerts = []
             if rainfall > WEATHER_IMPACT["heavy_rain_mm"]:
                 alerts.append(f"Heavy Rain ({rainfall}mm) → Supply disruption likely")
@@ -90,12 +83,12 @@ def get_3day_weather(district):
                 alerts.append(f"High Humidity ({avg_humidity}%) → Storage issues")
 
             result.append({
-                "date"       : date,
-                "avg_temp"   : avg_temp,
+                "date"        : date,
+                "avg_temp"    : avg_temp,
                 "avg_humidity": avg_humidity,
-                "rainfall_mm": rainfall,
-                "condition"  : condition,
-                "alerts"     : alerts
+                "rainfall_mm" : rainfall,
+                "condition"   : condition,
+                "alerts"      : alerts
             })
 
         return result
@@ -144,9 +137,9 @@ def build_prompt(prediction_data, weather_3day):
         weather_info = ""
         labels = ["Today", "Tomorrow", "Day After"]
         for i, day in enumerate(weather_3day):
-            label    = labels[i] if i < len(labels) else day["date"]
-            rain_str = f" | 🌧️ Rain: {day['rainfall_mm']}mm" if day["rainfall_mm"] > 0 else ""
-            alert_str= f" ⚠️ {', '.join(day['alerts'])}" if day["alerts"] else ""
+            label     = labels[i] if i < len(labels) else day["date"]
+            rain_str  = f" | 🌧️ Rain: {day['rainfall_mm']}mm" if day["rainfall_mm"] > 0 else ""
+            alert_str = f" ⚠️ {', '.join(day['alerts'])}" if day["alerts"] else ""
             weather_info += f"  {label} ({day['date']}): {day['condition']} | {day['avg_temp']}°C | Humidity: {day['avg_humidity']}%{rain_str}{alert_str}\n"
 
     # ── Festival string ──
@@ -163,38 +156,44 @@ def build_prompt(prediction_data, weather_3day):
         "consumer"    : "a buyer who wants to purchase this commodity at the lowest possible price"
     }
 
+    # ── FIXED PROMPT — no contradiction ──
     prompt = f"""
-        You are an agricultural commodity price advisor in Tamil Nadu.
+You are an agricultural commodity price advisor in Tamil Nadu.
 
-        Commodity: {commodity}
-        District: {district}
-        User: {user_type}
+Commodity: {commodity}
+District: {district}
+User: {user_type} — {user_context.get(user_type, "")}
 
-        Today Price: ₹{today_price}/quintal
-        Weekly Avg: ₹{weekly_avg}
-        Trend: {trend}
+Today Price: ₹{today_price}/quintal
+Weekly Avg:  ₹{weekly_avg}/quintal
+Trend: {trend}
 
-        Prediction:
-        Tomorrow ₹{tomorrow}
-        Day After ₹{day_after}
+Price Prediction:
+  Tomorrow:  ₹{tomorrow}/quintal
+  Day After: ₹{day_after}/quintal
 
-        Weather (3 days):
-        {weather_info}
+Weather Forecast (3 days):
+{weather_info}
 
-        Harvest: {harvest}
-        Festival Demand: {festival_info}
-        System Signal: {signal}
+Harvest Status: {harvest}
+Festival Demand:
+{festival_info}
 
-        Give a short advisory.
+System Signal: {signal}
 
-        Output rules:
-        1. Line 1 → Market summary with price and trend
-        2. Line 2 → What the {user_type} should do today
-        3. Line 3 → One risk or opportunity (weather/festival)
-        4. Line 4 → Combining harvest time and Festival time statement
+Give exactly 4 lines of advisory. No numbering. No bullet points.
 
-        Use simple English. Max 3 lines.
-        """
+Line 1 → Market summary: current price, trend, and tomorrow prediction
+Line 2 → Specific action the {user_type} should take TODAY and why
+Line 3 → One key risk or opportunity from weather or festival demand
+Line 4 → How harvest season and festival together affect this commodity now
+
+Rules:
+- Simple English only
+- Each line must be a complete meaningful sentence
+- Do not combine lines
+- Do not add any extra lines or headings
+"""
     return prompt
 
 
@@ -203,57 +202,56 @@ def build_prompt(prediction_data, weather_3day):
 # ─────────────────────────────────────────
 def call_gemini(prompt):
     try:
-        url =f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
 
         payload = {
             "contents": [{
                 "parts": [{"text": prompt}]
             }],
             "generationConfig": {
-                "temperature"    : 0.3,
-                "maxOutputTokens": 300,
-                "thinkingConfig": { "thinkingBudget": 200}
+                "temperature"    : 0.4,
+                "maxOutputTokens": 500   # ← increased from 300
+                # thinkingConfig removed — was causing empty output
             }
         }
 
         response = requests.post(url, json=payload, timeout=15)
 
         if response.status_code == 200:
-            data = response.json()
+            data  = response.json()
             parts = (data.get("candidates", [{}])[0].get("content", {}) or {}).get("parts", []) or []
-            text = "".join([p.get("text", "") for p in parts]).strip()
-            print(f"  DEBUG — Full Gemini response:\n{text}")
-            print(f"  DEBUG — Token count: {len(text.split())}")
-            print("DEBUG FULL JSON:", response.json())
+            text  = "".join([p.get("text", "") for p in parts]).strip()
             return text
         else:
-            print(f"  ⚠️  Gemini error: {response.status_code}")
+            print(f"  ⚠️  Gemini error {response.status_code}: {response.text}")
             return None
 
     except Exception as e:
         print(f"  ⚠️  Gemini failed: {e}")
         return None
 
+
 # ─────────────────────────────────────────
-#  GEMINI FALLBACK — When no MySQL data
+#  GEMINI FALLBACK — When no DB data
 #  Searches web for current price
 # ─────────────────────────────────────────
 def gemini_search_price(district, commodity):
     try:
         prompt = f"""
-Search the web and find the current mandi market price 
+Search the web and find the current mandi market price
 of {commodity} in {district}, Tamil Nadu, India.
 
-Provide:
-1. Current approximate price in ₹ per quintal
-2. Price trend (rising/falling/stable)
-3. One line market summary
+Provide exactly 4 lines:
+Line 1 → Current approximate price in ₹ per quintal
+Line 2 → Price trend (rising / falling / stable) with reason
+Line 3 → One line market summary
+Line 4 → Advice for a farmer — should they sell now or wait?
 
 Rules:
-- Respond in English only
+- English only
 - Use ₹ and quintal units
-- 4 lines maximum
-- If price not found say "Price data currently unavailable"
+- No bullet points or numbering
+- If price not found, say "Price data currently unavailable"
 """
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
 
@@ -266,34 +264,35 @@ Rules:
             }],
             "generationConfig": {
                 "temperature"    : 0.5,
-                "maxOutputTokens": 300,
-                "thinkingConfig": { "thinkingBudget": 200}
+                "maxOutputTokens": 500
             }
         }
 
         response = requests.post(url, json=payload, timeout=15)
 
         if response.status_code == 200:
-            data = response.json()
+            data  = response.json()
             parts = (data.get("candidates", [{}])[0].get("content", {}) or {}).get("parts", []) or []
-            text = "".join([p.get("text", "") for p in parts]).strip()
+            text  = "".join([p.get("text", "") for p in parts]).strip()
             return text
         else:
+            print(f"  ⚠️  Gemini search error {response.status_code}: {response.text}")
             return None
 
     except Exception as e:
         print(f"  ⚠️  Gemini search failed: {e}")
         return None
+
+
 # ─────────────────────────────────────────
 #  MAIN — GENERATE COMPLETE ADVISORY
 # ─────────────────────────────────────────
 def generate_advisory(prediction_data):
-    
-     # ── Check if we have MySQL data ──
+
     if not prediction_data:
         return None
 
-    # ── If no price history → use Gemini search ──
+    # ── No price history → use Gemini web search fallback ──
     if not prediction_data.get("prices"):
         print("\n⚠️  No DB data — using Gemini web search...")
         district  = prediction_data.get("district", "")
@@ -309,10 +308,7 @@ def generate_advisory(prediction_data):
 
         return result
 
-    # ── Normal flow — MySQL data available ──
-    # ... rest of existing code stays same
-    
-    
+    # ── Normal flow — DB data available ──
     print("\n" + "=" * 60)
     print("  🤖 AI Advisory (Powered by Gemini)")
     print("=" * 60)
@@ -336,7 +332,7 @@ def generate_advisory(prediction_data):
 
     # Step 2 — Build prompt
     print(f"\n🧠 Generating AI advisory...")
-    prompt   = build_prompt(prediction_data, weather_3day)
+    prompt = build_prompt(prediction_data, weather_3day)
 
     # Step 3 — Call Gemini
     advisory = call_gemini(prompt)
@@ -346,7 +342,7 @@ def generate_advisory(prediction_data):
         print(advisory)
         print(f"{'='*60}")
     else:
-        # Fallback
+        # Fallback — show system signal
         print(f"\n{'='*60}")
         print(f"  {prediction_data['signal']}")
         print(f"  {prediction_data['reason']}")
@@ -382,4 +378,3 @@ if __name__ == "__main__":
 
     if result:
         generate_advisory(result)
-
