@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Market Advisory — AgriPrice Intelligence</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+</head>
+
+<body class="bg-[#fafaf7] text-gray-900 pb-12 animate-fade-in">
+
+  <!-- NAVBAR -->
+  <nav class="bg-[#27500A] text-white px-6 md:px-12 h-14 flex items-center justify-between sticky top-0 z-50 shadow-md">
+    <a href="index.html" class="font-bold text-lg flex items-center gap-2">🌾 AgriPrice</a>
+    <ul class="hidden md:flex items-center gap-1 list-none" id="navLinks">
+      <li><a href="index.html"
+          class="text-white/80 hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-lg text-sm font-medium transition"
+          data-i18n="nav_home">Home</a></li>
+      <li><a href="prices.html"
+          class="text-white/80 hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-lg text-sm font-medium transition"
+          data-i18n="nav_results">Market Prices</a></li>
+      <li><a href="seasonal.html"
+          class="text-white/80 hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-lg text-sm font-medium transition"
+          data-i18n="nav_seasonal">Seasonal</a></li>
+      <li><a href="about.html"
+          class="text-white/80 hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-lg text-sm font-medium transition"
+          data-i18n="nav_about">About</a></li>
+    </ul>
+    <button class="md:hidden text-2xl" onclick="document.getElementById('navLinks').classList.toggle('flex')">☰</button>
+  </nav>
+
+  <div class="w-full px-6 md:px-12 pt-4">
+    <!-- TOP BANNER CARD -->
+    <div class="bg-[#27500A] text-white p-6 md:p-8 rounded-3xl shadow-sm">
+      <div class="flex flex-wrap gap-2 text-[10px] tracking-wider font-extrabold uppercase mb-3">
+        <span class="bg-white/10 border border-white/10 px-3.5 py-1.5 rounded-full text-white">
+          <span id="roleLabel">—</span>
+        </span>
+        <span class="bg-white/10 border border-white/10 px-3.5 py-1.5 rounded-full text-white">
+          <span id="districtLabel">—</span>
+        </span>
+        <span class="bg-white/10 border border-white/10 px-3.5 py-1.5 rounded-full text-white">
+          <span id="queryLabel">—</span>
+        </span>
+      </div>
+      <h1 class="text-3xl md:text-4xl font-extrabold mt-1" id="bannerTitle">
+        Report
+      </h1>
+      <p class="text-xs opacity-75 mt-1.5 font-medium" id="bannerSubtitle">Live advisory & market intelligence • Tamil Nadu</p>
+    </div>
+  </div>
+
+  <div class="w-full px-6 md:px-12 mt-4">
+    <!-- Loading state -->
+    <div id="loadingIndicator" class="flex flex-col items-center justify-center py-20 gap-4">
+      <div class="spinner"></div>
+      <span class="text-gray-500 font-semibold text-sm">Generating advisory...</span>
+    </div>
+
+    <!-- Main content wrapper -->
+    <div id="dashboardContent" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-5">
+      
+      <!-- DB Miss Banner -->
+      <div class="hidden lg:col-span-12" id="dbMissBanner">
+        <div class="bg-red-50 border border-red-200 text-red-950 p-4 rounded-2xl flex items-start gap-3 shadow-sm">
+          <span class="text-xl mt-0.5">⚠️</span>
+          <div>
+            <h4 class="font-extrabold text-sm">No Local Mandi Data Found</h4>
+            <p class="text-xs opacity-90 mt-1">Using live search grounding to synthesize current pricing and advisor recommendations.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Left Column (lg:col-span-8) -->
+      <div class="lg:col-span-8 space-y-5">
+        
+        <!-- Letter-style Advisory Card -->
+        <div class="bg-white border border-gray-150 rounded-3xl p-6 shadow-sm relative overflow-hidden">
+
+          <div class="flex items-center justify-between border-b border-gray-100 pb-3 mb-4 flex-wrap gap-2">
+            <h2 class="text-[#27500A] font-extrabold text-2xl flex items-center gap-2">AI Advisory </h2>
+            <div class="flex items-center gap-3">
+              <!-- Advisory-specific Language Selector -->
+              <div class="inline-flex bg-gray-100 rounded-full p-0.5 border border-gray-200 shadow-inner">
+                <button id="advLangBtnEn" onclick="setAdvisoryLang('en')"
+                  class="px-3 py-1 text-base font-bold rounded-full bg-white text-[#27500A] shadow-sm transition">English</button>
+                <button id="advLangBtnTa" onclick="setAdvisoryLang('ta')"
+                  class="px-3 py-1 text-base font-bold rounded-full text-gray-500 hover:text-[#27500A] transition">தமிழ்</button>
+              </div>
+              <span class="text-2xl font-bold text-green-700 bg-green-50 px-3 py-1 rounded-full"> Gemini AI</span>
+            </div>
+          </div>
+
+          <p id="advisoryText" class="text-sm sm:text-base md:text-lg text-gray-800 leading-relaxed font-semibold whitespace-pre-line bg-[#fafaf7] p-6 md:p-8 rounded-2xl border border-gray-150 animate-fade-in">
+            Loading...
+          </p>
+
+          <!-- Recommendation grid boxes -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-100">
+            <!-- Recommendation box -->
+            <div class="bg-red-50 border border-red-100 p-5 rounded-2xl">
+              <span class="text-base font-bold text-red-700 uppercase tracking-widest block mb-2">AI Recommendation</span>
+              <strong class="bg-yellow-100 text-yellow-800 text-3xl border border-yellow-250" id="trendBadge">Stable</strong>
+              <span class="text-xs text-gray-500 font-medium leading-relaxed block mt-2">Action suggestion based on historical trends.</span>
+            </div>
+            
+            <!-- Harvest context box -->
+            <div class="bg-green-50 border border-green-100 p-5 rounded-2xl">
+              <span class="text-base font-bold text-green-700 uppercase tracking-widest block mb-2">Harvest Context</span>
+              <span id="harvestMeta" class="text-sm font-black text-green-955 block leading-relaxed">—</span>
+            </div>
+            
+            <!-- Holiday impact box -->
+            <div class="bg-yellow-50 border border-yellow-150 p-5 rounded-2xl">
+              <span class="text-base font-bold text-yellow-800 uppercase tracking-widest block mb-2">Holiday Impact</span>
+              <span id="festivalMeta" class="text-sm font-black text-yellow-955 block leading-relaxed">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3-Day Weather Forecast Column Card -->
+        <div class="bg-white border border-gray-150 rounded-3xl p-6 shadow-sm space-y-4" id="weatherSection">
+          <div class="flex items-center justify-between border-b border-gray-100 pb-2">
+            <h3 class="font-extrabold text-sm text-gray-900 flex items-center gap-2 uppercase tracking-wider">
+              🌦️ 3-Day Weather Forecast — <span id="weatherDistrict">—</span>
+            </h3>
+            <span class="text-xs text-gray-450 font-bold">💧 <span id="weatherHumidity">0%</span> · 🌬️ <span id="weatherWind">0 km/h</span></span>
+          </div>
+          
+          <div class="grid grid-cols-3 gap-4" id="weatherForecastGrid">
+            <!-- Populated dynamically via javascript -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Sidebar Price details (lg:col-span-4) -->
+      <div class="lg:col-span-4 space-y-5">
+        
+        <!-- Best price overview card -->
+        <div class="bg-white border border-gray-150 rounded-3xl p-6 shadow-sm space-y-4">
+          <div class="border-b border-gray-100 pb-2 flex justify-between items-center">
+            <h3 class="font-extrabold text-xs text-gray-900 uppercase tracking-wider" id="bestPriceTitle">Best Price</h3>
+          </div>
+          
+          <div class="space-y-3">
+            <div class="bg-green-50/50 border border-green-100 p-4 rounded-2xl text-center">
+              <span class="text-[9px] font-bold text-green-700 uppercase tracking-widest block mb-0.5">Top Mandi Rate</span>
+              <strong class="text-2xl font-black text-green-955 block" id="priceQuintal">₹0</strong>
+              <span class="text-[10px] text-gray-400 font-bold block mt-0.5">per Quintal</span>
+            </div>
+            
+            <div class="bg-blue-50/50 border border-blue-100 p-3 rounded-2xl text-center">
+              <span class="text-[9px] font-bold text-blue-700 uppercase tracking-widest block mb-0.5">Estimated Retail</span>
+              <strong class="text-lg font-black text-blue-955 block" id="priceKg">₹0</strong>
+              <span class="text-[10px] text-gray-400 font-bold block mt-0.5">per Kilogram</span>
+            </div>
+          </div>
+          
+          <!-- Mini Stats Grid (Highly Visible text-xs md:text-sm) -->
+          <div class="grid grid-cols-3 gap-2 mt-3 text-center">
+            <div class="bg-gray-50/50 border border-gray-100 p-2.5 rounded-xl">
+              <span class="block text-[12px] font-bold text-gray-400 uppercase">Avg</span>
+              <strong class="text-base md:text-sm font-extrabold text-gray-800 block truncate" id="statGridAvg">—</strong>
+            </div>
+            <div class="bg-gray-50/50 border border-gray-100 p-2.5 rounded-xl">
+              <span class="block text-[12px] font-bold text-gray-400 uppercase">Min</span>
+              <strong class="text-base md:text-sm font-extrabold text-gray-800 block truncate" id="statGridMin">—</strong>
+            </div>
+            <div class="bg-gray-50/50 border border-gray-100 p-2.5 rounded-xl">
+              <span class="block text-[12px] font-bold text-gray-400 uppercase">Trend</span>
+              <strong class="text-base md:text-sm font-extrabold text-gray-800 block truncate" id="statGridTrend">—</strong>
+            </div>
+            <div class="bg-gray-50/50 border border-gray-100 p-2.5 rounded-xl">
+              <span class="block text-[12px] font-bold text-gray-400 uppercase">Last Price</span>
+              <strong class="text-base md:text-sm font-extrabold text-gray-800 block truncate" id="statGridLast">—</strong>
+            </div>
+            <div class="bg-gray-50/50 border border-gray-100 p-2.5 rounded-xl">
+              <span class="block text-[12px] font-bold text-gray-400 uppercase">Weekly Avg</span>
+              <strong class="text-base md:text-sm font-extrabold text-gray-800 block truncate" id="statGridWeekly">—</strong>
+            </div>
+            <div class="bg-[#f3f7ed] border border-[#d4e2be] p-2.5 rounded-xl">
+              <span class="block text-[12px] font-bold text-green-700 uppercase">Confidence</span>
+              <strong class="text-base md:text-sm font-extrabold text-green-955 block" id="statGridConfidence">94%</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Minimum Market Prices in the District -->
+        <div class="bg-white border border-gray-150 rounded-3xl p-6 shadow-sm space-y-3">
+          <div class="border-b border-gray-100 pb-2">
+            <h3 class="font-extrabold text-xs text-gray-400 uppercase tracking-widest" id="minPricesTitle">Minimum Market Prices</h3>
+          </div>
+          <div id="localMandiList" class="space-y-2">
+            <div class="text-gray-400 text-xs py-1">Loading mandi records...</div>
+          </div>
+        </div>
+
+        <!-- Action Links panel -->
+        <div class="bg-white border border-gray-150 rounded-3xl p-6 shadow-sm space-y-2.5">
+          <button onclick="goToDetailedPrices()"
+            class="w-full py-3 bg-[#27500A] hover:bg-[#3d7a15] text-white text-base rounded-xl font-bold transition shadow flex items-center justify-center gap-2">
+            View Detailed Trends & Analytics
+          </button>
+          <button onclick="shareOnWhatsApp()"
+            class="w-full py-3 border-2 border-green-600 hover:bg-green-50 text-green-700 text-base rounded-xl font-bold transition flex items-center justify-center gap-2">
+            Share Report on WhatsApp
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-[#27500A] text-white/70 text-center py-6 text-xs mt-16 border-t border-white/5">
+    <p>© 2026 AgriPrice Intelligence. Data sourced from data.gov.in</p>
+  </footer>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="bottom-nav hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50">
+    <div class="flex justify-around py-2">
+      <a href="index.html" class="flex flex-col items-center text-[10px] text-gray-400 gap-0.5"><span
+          class="text-xl">🏠</span><span data-i18n="nav_home">Home</span></a>
+      <a href="prices.html" class="flex flex-col items-center text-[10px] text-gray-400 gap-0.5"><span
+          class="text-xl">📊</span><span data-i18n="nav_results">Prices</span></a>
+      <a href="seasonal.html" class="flex flex-col items-center text-[10px] text-gray-400 gap-0.5"><span
+          class="text-xl">🌱</span><span data-i18n="nav_seasonal">Seasonal</span></a>
+      <a href="about.html" class="flex flex-col items-center text-[10px] text-gray-400 gap-0.5"><span
+          class="text-xl">ℹ️</span><span data-i18n="nav_about">About</span></a>
+    </div>
+  </nav>
+
+  <script src="js/translations.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/results.js"></script>
+</body>
+
+</html>

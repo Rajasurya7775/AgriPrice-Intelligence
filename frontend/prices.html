@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Market Prices Analysis — AgriPrice Intelligence</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+</head>
+
+<body class="bg-[#fafaf7] text-gray-900 pb-12 animate-fade-in">
+
+  <!-- NAVBAR -->
+  <nav class="bg-[#27500A] text-white px-6 md:px-12 h-14 flex items-center justify-between sticky top-0 z-50 shadow-md">
+    <a href="index.html" class="font-bold text-lg flex items-center gap-2">🌾 AgriPrice</a>
+    <ul class="hidden md:flex items-center gap-1 list-none" id="navLinks">
+      <li><a href="index.html"
+          class="text-white/80 hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-lg text-base font-medium transition"
+          data-i18n="nav_home">Home</a></li>
+      <li><a href="prices.html" class="bg-white/10 text-white px-3 py-1.5 rounded-lg text-base font-medium transition"
+          data-i18n="nav_results">Market Prices</a></li>
+      <li><a href="seasonal.html"
+          class="text-white/80 hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-lg text-base font-medium transition"
+          data-i18n="nav_seasonal">Seasonal</a></li>
+      <li><a href="about.html"
+          class="text-white/80 hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-lg text-base font-medium transition"
+          data-i18n="nav_about">About</a></li>
+    </ul>
+    <button class="md:hidden text-2xl" onclick="document.getElementById('navLinks').classList.toggle('flex')">☰</button>
+  </nav>
+
+  <!-- SELECT DROPDOWNS ROW (NO OUTER CONTAINER CARD) -->
+  <div class="w-full px-6 md:px-12 pt-4 flex gap-3">
+    <select id="pricesCommodity" onchange="analyzeMarketPrices()"
+      class="bg-white border border-gray-200 text-xs rounded-xl px-4 py-2 font-bold outline-none cursor-pointer text-gray-800 shadow-sm hover:border-gray-300 transition-colors"></select>
+    <select id="pricesDistrict" onchange="analyzeMarketPrices()"
+      class="bg-white border border-gray-200 text-xs rounded-xl px-4 py-2 font-bold outline-none cursor-pointer text-gray-800 shadow-sm hover:border-gray-300 transition-colors"></select>
+  </div>
+
+  <div class="w-full px-6 md:px-12 mt-4">
+    <!-- Triggered Alerts Display -->
+    <div id="triggeredAlertsContainer" class="space-y-2 mb-4"></div>
+
+    <!-- Loading State -->
+    <div id="loadingIndicator" class="flex flex-col items-center justify-center py-20 gap-4">
+      <div class="spinner"></div>
+      <span class="text-gray-500 font-semibold text-sm">Analyzing market records...</span>
+    </div>
+
+    <!-- Content Grid -->
+    <div id="pricesContent" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-5">
+      
+      <!-- Chart Column (lg:col-span-8) -->
+      <div class="lg:col-span-8">
+        <!-- 7-Day Trend Chart Card -->
+        <div class="bg-white border border-gray-150 rounded-3xl p-6 shadow-sm">
+          <div class="flex items-center justify-between border-b border-gray-100 pb-2 mb-3">
+            <h3 class="text-base font-bold text-[#27500A] uppercase tracking-wider" id="chartTitle">7-Day Trend</h3>
+            <span id="volatilityBadge" class="text-xs px-2.5 py-1 rounded-full font-bold">Stable Prices</span>
+          </div>
+          <div class="relative h-72 w-full">
+            <canvas id="pricesTrendChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alerts Sidebar Column (lg:col-span-4) -->
+      <div class="lg:col-span-4">
+        <!-- Target Price Alerts Card -->
+        <div class="bg-white border border-gray-150 rounded-3xl p-6 shadow-sm space-y-3 h-full flex flex-col justify-between">
+          <div>
+            <h3 class="text-base font-bold text-[#27500A] uppercase tracking-wider">Price Alerts</h3>
+          </div>
+
+          <div class="space-y-2.5 text-base flex-1 mt-2">
+            <div>
+              <label class="block text-gray-500 font-semibold mb-1">Commodity</label>
+              <select id="alertCommodity" class="w-full border border-gray-200 p-2 rounded-xl bg-white outline-none font-semibold"></select>
+            </div>
+            <div>
+              <label class="block text-gray-500 font-semibold mb-1">District</label>
+              <select id="alertDistrict" class="w-full border border-gray-200 p-2 rounded-xl bg-white outline-none font-semibold"></select>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-gray-500 font-semibold mb-1">Target (₹/Kg)</label>
+                <input type="number" id="alertPrice" placeholder="e.g. 40"
+                  class="w-full border border-gray-200 p-2.5 rounded-xl outline-none font-semibold" />
+              </div>
+              <div>
+                <label class="block text-gray-500 font-semibold mb-1">Condition</label>
+                <select id="alertDirection" class="w-full border border-gray-200 p-2.5 rounded-xl bg-white outline-none font-semibold">
+                  <option value="above">Goes Above</option>
+                  <option value="below">Goes Below</option>
+                </select>
+              </div>
+            </div>
+            <button id="btnSaveAlert"
+              class="w-full py-3 bg-[#27500A] text-white rounded-xl font-bold hover:bg-[#3d7a15] transition shadow-sm">Add Alert</button>
+          </div>
+
+          <div class="border-t border-gray-100 pt-3 mt-2">
+            <span class="text-[15px] font-bold text-gray-400 uppercase tracking-widest block mb-2">ACTIVE ALERTS</span>
+            <div id="activeAlertsList" class="space-y-2 max-h-36 overflow-y-auto pr-1"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- District Mandi Rates Overview Card (lg:col-span-12) -->
+      <div class="lg:col-span-12 bg-white border border-gray-150 rounded-3xl p-6 shadow-sm">
+        <h3 class="text-base font-bold text-gray-900 border-b border-gray-100 pb-2 mb-3">District Markets Rates Overview</h3>
+        <div id="pricesLocalCard"></div>
+      </div>
+
+      <!-- Nearby District Comparison Card (lg:col-span-12) -->
+      <div class="lg:col-span-12 bg-white border border-gray-150 rounded-3xl p-6 shadow-sm space-y-3">
+        <h3 class="text-base font-bold text-[#27500A] uppercase tracking-wider border-b border-gray-100 pb-2">Nearby Districts</h3>
+        <div id="neighboringComparisons" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <!-- Dynamically populated neighboring cards -->
+        </div>
+      </div>
+
+      <!-- State Comparison Table Card (lg:col-span-12) -->
+      <div class="lg:col-span-12 bg-white border border-gray-150 rounded-3xl p-6 shadow-sm">
+        <h3 class="text-base font-bold text-[#27500A] border-b border-gray-100 pb-2 mb-3 uppercase tracking-wider animate-fade-in">State-wide Rates</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-base text-left border-collapse">
+            <thead>
+              <tr class="border-b border-gray-150 uppercase text-gray-400 text-[15px] tracking-wider font-extrabold">
+                <th class="py-3 px-4">Market</th>
+                <th class="py-3 px-4">District</th>
+                <th class="py-3 px-4 text-right">₹ / Quintal</th>
+                <th class="py-3 px-4 text-right">₹ / Kg</th>
+                <th class="py-3 px-4 text-center">Trend</th>
+              </tr>
+            </thead>
+            <tbody id="comparisonTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-[#27500A] text-white/70 text-center py-5 text-xs mt-12 border-t border-white/5">
+    <p>© 2026 AgriPrice Intelligence. Data sourced from dat.gov.in </p>
+  </footer>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="bottom-nav hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50">
+    <div class="flex justify-around py-2">
+      <a href="index.html" class="flex flex-col items-center text-[10px] text-gray-400 gap-0.5"><span
+          class="text-xl">🏠</span><span data-i18n="nav_home">Home</span></a>
+      <a href="prices.html" class="flex flex-col items-center text-[10px] text-gray-400 gap-0.5"><span
+          class="text-xl">📊</span><span data-i18n="nav_results">Prices</span></a>
+      <a href="seasonal.html" class="flex flex-col items-center text-[10px] text-gray-400 gap-0.5"><span
+          class="text-xl">🌱</span><span data-i18n="nav_seasonal">Seasonal</span></a>
+      <a href="about.html" class="flex flex-col items-center text-[10px] text-gray-400 gap-0.5"><span
+          class="text-xl">ℹ️</span><span data-i18n="nav_about">About</span></a>
+    </div>
+  </nav>
+
+  <script src="js/translations.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/prices.js"></script>
+</body>
+
+</html>

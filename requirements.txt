@@ -1,0 +1,12 @@
+# Core Web Framework
+flask>=3.0.0
+flask-cors>=4.0.0
+
+# Database Connectivity
+psycopg2-binary>=2.9.0
+
+# External API Integrations (OpenWeather, Govt Agmarknet)
+requests>=2.31.0
+
+# Configuration Management
+python-dotenv>=1.0.0

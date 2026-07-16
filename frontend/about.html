@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — AgriPrice Intelligence</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+</head>
+
+<body class="bg-[#fafaf7] text-gray-900 pb-16 animate-fade-in">
+
+  <!-- NAVBAR -->
+  <nav class="bg-[#27500A] text-white px-6 md:px-12 h-14 flex items-center justify-between sticky top-0 z-50 shadow-md">
+    <a href="index.html" class="font-bold text-lg flex items-center gap-2">🌾 AgriPrice</a>
+    <ul class="hidden md:flex items-center gap-1 list-none" id="navLinks">
+      <li><a href="index.html"
+          class="text-white/80 hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-lg text-base font-medium transition"
+          data-i18n="nav_home">Home</a></li>
+      <li><a href="prices.html"
+          class="text-white/80 hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-lg text-base font-medium transition"
+          data-i18n="nav_results">Market Prices</a></li>
+      <li><a href="seasonal.html"
+          class="text-white/80 hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-lg text-base font-medium transition"
+          data-i18n="nav_seasonal">Seasonal</a></li>
+      <li><a href="about.html" class="bg-white/10 text-white px-3 py-1.5 rounded-lg text-base font-medium transition"
+          data-i18n="nav_about">About</a></li>
+    </ul>
+    <button class="md:hidden text-2xl" onclick="document.getElementById('navLinks').classList.toggle('flex')">☰</button>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="bg-gradient-to-br from-[#27500A] to-[#3d7a15] text-white py-12 px-6 md:px-12 shadow-md">
+    <div class="w-full">
+      <h1 class="text-2xl md:text-3xl font-extrabold" data-i18n="about_title">About AgriPrice Intelligence</h1>
+    </div>
+  </div>
+
+  <div class="w-full px-6 md:px-12 py-10 space-y-8">
+    <!-- Mission -->
+    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-gray-150 shadow-sm text-base text-gray-700 leading-relaxed space-y-3">
+      <h2 class="text-[#27500A] font-extrabold text-base flex items-center gap-2">🎯 <span data-i18n="about_mission">Our Mission</span></h2>
+      <p>AgriPrice Intelligence gives Tamil Nadu farmers, traders, and consumers real-time commodity price data powered
+        by AI — so they can make smarter decisions without depending on middlemen.</p>
+      <p>This project was built to solve a real local problem: price opacity in agricultural markets. Data
+        is fetched automatically from Agmarknet and enriched with AI-generated advisory using Google Gemini.</p>
+    </div>
+
+    <!-- Tech Stack -->
+    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-gray-150 shadow-sm">
+      <h2 class="text-[#27500A] font-extrabold text-lg mb-4 flex items-center gap-2">⚙️ <span data-i18n="about_tech">Technology Stack</span></h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-base text-gray-700">
+        <div class="flex items-center gap-2 bg-slate-50/50 border border-gray-100 p-3 rounded-2xl font-semibold"><span class="text-base">🐍</span>
+          Python / Flask</div>
+        <div class="flex items-center gap-2 bg-slate-50/50 border border-gray-100 p-3 rounded-2xl font-semibold"><span class="text-base">🐘</span>
+          PostgreSQL (Neon)</div>
+        <div class="flex items-center gap-2 bg-slate-50/50 border border-gray-100 p-3 rounded-2xl font-semibold"><span class="text-base">🤖</span>
+          Google Gemini AI</div>
+        <div class="flex items-center gap-2 bg-slate-50/50 border border-gray-100 p-3 rounded-2xl font-semibold"><span class="text-base">🌐</span>
+          Agmarknet API</div>
+        <div class="flex items-center gap-2 bg-slate-50/50 border border-gray-100 p-3 rounded-2xl font-semibold"><span class="text-base">🌦️</span>
+          OpenWeatherMap</div>
+        <div class="flex items-center gap-2 bg-slate-50/50 border border-gray-100 p-3 rounded-2xl font-semibold"><span class="text-base">📊</span>
+          Chart.js</div>
+        <div class="flex items-center gap-2 bg-slate-50/50 border border-gray-100 p-3 rounded-2xl font-semibold"><span class="text-base">🎨</span>
+          Tailwind CSS</div>
+        <div class="flex items-center gap-2 bg-slate-50/50 border border-gray-100 p-3 rounded-2xl font-semibold"><span class="text-base">☁️</span>
+          Render (Deploy)</div>
+      </div>
+    </div>
+
+    <!-- Data Sources -->
+    <div class="space-y-4">
+      <h2 class="text-[#27500A] font-extrabold text-lg px-2">📡 <span data-i18n="about_data">Data Sources</span></h2>
+      <div class="bg-white rounded-3xl p-5 border border-gray-150 shadow-sm flex gap-4 items-start text-base">
+        <span class="text-2xl mt-0.5">🏛️</span>
+        <div>
+          <p class="font-extrabold text-gray-800 text-base">Agmarknet (data.gov.in)</p>
+          <p class="text-gray-400 font-semibold mt-1 leading-relaxed">Official Government of India agricultural market price data.
+            Auto-fetched daily via cron-job.org.</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-3xl p-5 border border-gray-150 shadow-sm flex gap-4 items-start text-base">
+        <span class="text-2xl mt-0.5">🌦️</span>
+        <div>
+          <p class="font-extrabold text-gray-800 text-base">OpenWeatherMap API</p>
+          <p class="text-gray-400 font-semibold mt-1 leading-relaxed">Live weather data for key Tamil Nadu districts. Used for agricultural
+            context in AI advisories.</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-3xl p-5 border border-gray-150 shadow-sm flex gap-4 items-start text-base">
+        <span class="text-2xl mt-0.5">🤖</span>
+        <div>
+          <p class="font-extrabold text-gray-800 text-base">Google Gemini 2.5 Flash</p>
+          <p class="text-gray-400 font-semibold mt-1 leading-relaxed">Market advisory generated based on live price data, trend analysis,
+            and weather context.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SQL Engine -->
+    <div class="bg-white rounded-3xl border border-gray-150 p-6 sm:p-8 shadow-sm">
+      <h2 class="text-[#27500A] font-extrabold text-base mb-3 flex items-center gap-2">🔍 SQL Analytics Engine</h2>
+      <p class="text-base text-gray-400 font-semibold mb-4">7 complex queries powering the analytics dashboard:</p>
+      <ul class="space-y-2 text-base text-gray-600 font-medium">
+        <li class="flex items-center gap-2">• <span><strong>Window functions</strong> — price rank per market per commodity</span></li>
+        <li class="flex items-center gap-2">• <span><strong>CTEs</strong> — 7-day rolling average trend calculation</span></li>
+        <li class="flex items-center gap-2">• <span><strong>STDDEV</strong> — volatility scoring across markets</span></li>
+        <li class="flex items-center gap-2">• <span><strong>Self JOIN</strong> — highest vs. lowest price market arbitrage detection</span></li>
+        <li class="flex items-center gap-2">• <span><strong>Subqueries</strong> — seasonal profit scoring per crop</span></li>
+        <li class="flex items-center gap-2">• <span><strong>TO_CHAR</strong> — formatted date series for Chart.js</span></li>
+        <li class="flex items-center gap-2">• <span><strong>DENSE_RANK</strong> — top market ranking by volume</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-[#27500A] text-white/70 text-center py-6 text-xs mt-16 border-t border-white/5">
+    <p data-i18n="footer_copy">© 2026 AgriPrice Intelligence. Data sourced from data.gov.in</p>
+  </footer>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="bottom-nav hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50">
+    <div class="flex justify-around py-2">
+      <a href="index.html" class="flex flex-col items-center text-[10px] text-gray-400 gap-0.5"><span
+          class="text-xl">🏠</span><span data-i18n="nav_home">Home</span></a>
+      <a href="prices.html" class="flex flex-col items-center text-[10px] text-gray-400 gap-0.5"><span
+          class="text-xl">📊</span><span data-i18n="nav_results">Prices</span></a>
+      <a href="seasonal.html" class="flex flex-col items-center text-[10px] text-gray-400 gap-0.5"><span
+          class="text-xl">🌱</span><span data-i18n="nav_seasonal">Seasonal</span></a>
+      <a href="about.html" class="flex flex-col items-center text-[10px] text-[#27500A] gap-0.5"><span
+          class="text-xl">ℹ️</span><span data-i18n="nav_about">About</span></a>
+    </div>
+  </nav>
+
+  <script src="js/translations.js"></script>
+</body>
+
+</html>
