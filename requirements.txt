@@ -1,6 +1,7 @@
-# Core Web Framework
+# Core Web Framework / WSGI Server
 flask>=3.0.0
 flask-cors>=4.0.0
+gunicorn>=21.2.0
 
 # Database Connectivity
 psycopg2-binary>=2.9.0
