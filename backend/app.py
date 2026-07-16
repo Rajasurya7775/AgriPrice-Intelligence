@@ -1,7 +1,3 @@
-# app.py
-# Flask application factory: registers all route blueprints and serves
-# the frontend static files from the ../frontend directory.
-
 import os
 from dotenv import load_dotenv
 

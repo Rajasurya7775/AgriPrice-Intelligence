@@ -1,15 +1,7 @@
-# config.py
-# Central configuration: database connection, API keys, and Tamil Nadu domain data.
-
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
-
-
-# ---------------------------------------------------------------------------
-# Database
-# ---------------------------------------------------------------------------
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
@@ -30,10 +22,6 @@ def get_db(cursor_factory=None):
     )
 
 
-# ---------------------------------------------------------------------------
-# External API keys and base URLs
-# ---------------------------------------------------------------------------
-
 AGMARKNET_API_KEY  = os.getenv("AGMARKNET_API_KEY")
 AGMARKNET_BASE_URL = "https://api.data.gov.in/resource/35985678-0d79-46b4-9ed6-6f13308a1d24"
 
@@ -44,10 +32,6 @@ OPENWEATHER_API_KEY  = os.getenv("OPENWEATHER_API_KEY")
 WEATHER_BASE_URL     = "https://api.openweathermap.org/data/2.5/weather"
 WEATHER_FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast"
 
-
-# ---------------------------------------------------------------------------
-# Load Tamil Nadu master domain data from metadata.json
-# ---------------------------------------------------------------------------
 
 import json
 
