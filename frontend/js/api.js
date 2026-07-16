@@ -1,6 +1,6 @@
 // api.js — All backend API calls
 
-const BASE_URL = window.location.origin; // auto-detects Render/localhost
+const BASE_URL = "https://agriprice-intelligence.onrender.com"; 
 
 async function fetchPrices(commodity, role = "farmer", district = "") {
   const res = await fetch(`${BASE_URL}/api/prices?commodity=${encodeURIComponent(commodity)}&role=${role}&district=${encodeURIComponent(district)}`);
