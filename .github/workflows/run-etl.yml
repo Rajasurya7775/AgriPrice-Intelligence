@@ -1,0 +1,32 @@
+name: Run Daily ETL Script
+
+on:
+  schedule:
+    # Runs at 02:00 UTC (07:30 AM Indian Standard Time) every day
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Allows manual trigger from Actions tab
+
+jobs:
+  run-etl:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Execute ETL Pipeline Script
+        env:
+          # Pulls the database credentials securely from GitHub Secrets
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          AGMARKNET_API_KEY: ${{ secrets.AGMARKNET_API_KEY }}
+        run: |
+          python -m backend.etl.pipeline
