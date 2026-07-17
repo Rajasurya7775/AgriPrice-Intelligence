@@ -2,8 +2,8 @@ name: Run Daily ETL Script
 
 on:
   schedule:
-    # Runs at 02:00 UTC (07:30 AM Indian Standard Time) every day
-    - cron: '0 2 * * *'
+    # Runs at 13:30 UTC (07:00 PM Indian Standard Time) every day
+    - cron: '30 13 * * *'
   workflow_dispatch: # Allows manual trigger from Actions tab
 
 jobs:
